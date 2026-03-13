@@ -22,44 +22,78 @@ pub enum Direction {
     Right,
 }
 
+
 const CHOPPING_BLOCK_WIDTH_PERCENTAGE: f32 = 0.7;
 const CHOPPING_BLOCK_HEIGHT_PERCENTAGE: f32 = 0.3;
-const STATIC_Z_INDEX: f32 = 0.;
-const MOVABLE_Z_INDEX: f32 = 1.;
+const BACKGROUND_Z_INDEX: f32 = 0.;
+const CUTTABLE_Z_INDEX: f32 = 1.;
+const MOVABLE_Z_INDEX: f32 = 2.;
 
-const KNIFE_WIDTH: f32 = 25.;
+const KNIFE_WIDTH: f32 = 50.;
 const KNIFE_X_OFFSET_TO_SHADOW: f32 = 50.0;
 
 const SHADOW_START_X_POSITION_PERCENTAGE: f32 = 0.35;
 const SHADOW_START_Y_POSITION: f32 = 0.;
-const SHADOW_HEIGHT_PERNCETAGE: f32 = 0.5;
+const SHADOW_HEIGHT_PERNCETAGE: f32 = 0.3;
 const SHADOW_WIDTH: f32 = 3.;
 
 const MOVEMENT_SPEED: f32 = 400.;
 
 fn create_chopping_block(
-    mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
+    commands: &mut Commands,
+    // materials: & mut ResMut<Assets<ColorMaterial>>,
+    // meshes: &mut ResMut<Assets<Mesh>>,
+    asset_server: &ResMut<AssetServer>,
     chopping_block_width: f32,
     chopping_block_center: f32,
     chopping_block_height: f32,
 ) {
+    // -400 .... 0 ... 250 ... 400
+    // 0 ... 100 ... x ... 200
+    
+    // 250 = x * 800 / 100
+    // x = 25000 / 800
+    // x = 31.25
+
+
+    // 0 .. 200
+    // 200 x 31.25 = 62.5
+
+    // let image_coordinates_center = (chopping_block_center * 100. / chopping_block_width) * 200;
+
+
     commands.spawn((
-        Mesh2d(meshes.add(Rectangle::new(
-            chopping_block_width,
-            chopping_block_height,
-        ))),
-        MeshMaterial2d(materials.add(Color::srgb(0.9, 0.3, 0.3))),
-        Transform::from_xyz(chopping_block_center, 0.0, STATIC_Z_INDEX),
+        // Mesh2d(meshes.add(Rectangle::new(
+        //     chopping_block_width,
+        //     chopping_block_height,
+        // ))),
+        // MeshMaterial2d(materials.add(Color::srgb(0.9, 0.3, 0.3))),
+        Sprite {
+            image: asset_server.load("knife_game/ant.png"),
+            rect: Some(Rect {
+                min: Vec2::new(
+                    chopping_block_center - chopping_block_width / 2.,
+                    - chopping_block_height / 2.,
+                ),
+                max: Vec2::new(
+                    chopping_block_center + chopping_block_width / 2.,
+                    chopping_block_height / 2.
+                )
+            }),
+            custom_size: Some(Vec2::new(chopping_block_width, chopping_block_height)),
+            image_mode: SpriteImageMode::Auto,
+            ..default()
+        },
+        Transform::from_xyz(chopping_block_center, 0.0, CUTTABLE_Z_INDEX),
         ChoppingBlock { width: chopping_block_width, center: chopping_block_center },
     ));
 }
 
 pub fn setup_chopping_block(
-    commands: Commands,
-    materials: ResMut<Assets<ColorMaterial>>,
-    meshes: ResMut<Assets<Mesh>>,
+    mut commands: Commands,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    asset_server: ResMut<AssetServer>,
     window: Single<& Window>,
 ) {
     let window_width = window.resolution.width();
@@ -68,13 +102,32 @@ pub fn setup_chopping_block(
     let chopping_block_width = window_width * CHOPPING_BLOCK_WIDTH_PERCENTAGE;
     let chopping_block_center = 0.;
     let chopping_block_height = window_height * CHOPPING_BLOCK_HEIGHT_PERCENTAGE;
-    create_chopping_block(commands, materials, meshes, chopping_block_width, chopping_block_center, chopping_block_height);
+
+    // create_chopping_block(&mut commands, &mut materials, &mut meshes, chopping_block_width, chopping_block_center, chopping_block_height);
+    create_chopping_block(
+        &mut commands,
+        &asset_server,
+        chopping_block_width,
+        chopping_block_center,
+        chopping_block_height);
+
+    let background_width = chopping_block_width * 1.2;
+    let background_height = chopping_block_height * 1.5;
+    commands.spawn((
+        Mesh2d(meshes.add(Rectangle::new(
+            background_width,
+            background_height,
+        ))),
+        MeshMaterial2d(materials.add(Color::srgb(0.82, 0.60, 0.35))),
+        Transform::from_xyz(0., 0.0, BACKGROUND_Z_INDEX),
+    ));
 }
 
 pub fn setup_knife(
     mut commands: Commands,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
+    asset_server: ResMut<AssetServer>,
     window: Single<& Window>,
 ) {
     let width = window.resolution.width();
@@ -88,7 +141,7 @@ pub fn setup_knife(
             SHADOW_WIDTH,
             height * SHADOW_HEIGHT_PERNCETAGE,
         ))),
-        MeshMaterial2d(materials.add(Color::srgb(0.1, 0.1, 0.1))),
+        MeshMaterial2d(materials.add(Color::srgb(0.5, 0.5, 0.5))),
         Transform::from_xyz(shadow_x_start_position, shadow_y_start_position, MOVABLE_Z_INDEX),
         Movable{},
         Shadow{},
@@ -96,14 +149,15 @@ pub fn setup_knife(
     ));
 
     let knife_x_start_position = shadow_x_start_position + KNIFE_X_OFFSET_TO_SHADOW;
-    let knife_y_start_position = SHADOW_START_Y_POSITION;
+    let knife_y_start_position = - height * 0.1;
 
     commands.spawn((
-        Mesh2d(meshes.add(Rectangle::new(
-            KNIFE_WIDTH,
-            height * SHADOW_HEIGHT_PERNCETAGE,
-        ))),
-        MeshMaterial2d(materials.add(Color::srgb(0., 0., 0.))),
+        Sprite {
+            image: asset_server.load("knife_game/knife.png"),
+            custom_size: Some(Vec2::new(KNIFE_WIDTH, height * (SHADOW_HEIGHT_PERNCETAGE + 0.2))),
+            image_mode: SpriteImageMode::Auto,
+            ..default()
+        },
         Transform::from_xyz(knife_x_start_position, knife_y_start_position, MOVABLE_Z_INDEX),
         Movable{},
         Knife{},
@@ -122,7 +176,6 @@ pub fn move_objects(
 
     let shadow_upr_limit = width / 2. * CHOPPING_BLOCK_WIDTH_PERCENTAGE;
     let shadow_lwr_limit = - shadow_upr_limit;
-
 
     match *shadow.1 {
         Direction::Right => {
@@ -155,8 +208,9 @@ pub fn move_objects(
 
 pub fn register_keystroke(
     mut commands: Commands,
-    mesh: ResMut<Assets<Mesh>>,
-    materials: ResMut<Assets<ColorMaterial>>,
+    // mut mesh: ResMut<Assets<Mesh>>,
+    // mut materials: ResMut<Assets<ColorMaterial>>,
+    asset_server: ResMut<AssetServer>,
     keys: Res<ButtonInput<KeyCode>>,
     window: Single<& Window>,
     chopping_block: Single<(& ChoppingBlock, Entity)>,
@@ -181,9 +235,10 @@ pub fn register_keystroke(
 
             commands.entity(chopping_block.1).despawn();
             create_chopping_block(
-                commands,
-                materials,
-                mesh,
+                &mut commands,
+                // &mut materials,
+                // & mut mesh,
+                &asset_server,
                 new_width,
                 new_center,
                 window.resolution.height() * CHOPPING_BLOCK_HEIGHT_PERCENTAGE,
