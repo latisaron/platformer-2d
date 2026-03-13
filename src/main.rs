@@ -8,15 +8,21 @@ mod setup_room;
 // use setup_room::{setup_walls, setup_bookshelf, setup_couch, setup_drawer, setup_floor};
 
 // mod setup_movable_block;
-// use setup_movable_block::{setup_controllable_block, keyboard_input}; 
+// use setup_movable_block::{setup_controllable_block, keyboard_input};
+
+mod setup_chopping_block;
+use setup_chopping_block::{setup_chopping_block, setup_knife, move_objects, register_keystroke};
 
 fn main() {
     App::new()
         .add_plugins(CustomWindowSetupPlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .add_plugins(RapierDebugRenderPlugin::default())
-        .add_systems(Startup, setup_graphics);
-    
+        .add_systems(Startup, setup_graphics)
+        .add_systems(Startup, (setup_chopping_block, setup_knife))
+        .add_systems(Update, (register_keystroke, move_objects).chain())
+        .run();
+
         // .add_systems(Startup, setup_walls)
         // .add_systems(Startup, (setup_floor, setup_bookshelf, setup_couch, setup_drawer).chain())
         // .add_systems(Startup, setup_controllable_block)
