@@ -11,7 +11,7 @@ mod setup_room;
 // use setup_movable_block::{setup_controllable_block, keyboard_input};
 
 mod setup_chopping_block;
-use setup_chopping_block::{setup_chopping_block, setup_knife, move_objects, register_keystroke};
+use setup_chopping_block::{setup_chopping_block, setup_knife, move_objects, register_keystroke, cut_animation, ChoppingGameState};
 
 fn main() {
     App::new()
@@ -19,8 +19,16 @@ fn main() {
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .add_plugins(RapierDebugRenderPlugin::default())
         .add_systems(Startup, setup_graphics)
+        .insert_state(ChoppingGameState::Playing)
         .add_systems(Startup, (setup_chopping_block, setup_knife))
-        .add_systems(Update, (register_keystroke, move_objects).chain())
+        .add_systems(
+    Update,
+        (
+                    register_keystroke.run_if(in_state(ChoppingGameState::Playing)),
+                    cut_animation.run_if(in_state(ChoppingGameState::Cutting)),
+                    move_objects.run_if(in_state(ChoppingGameState::Playing))
+                ).chain()
+        )
         .run();
 
         // .add_systems(Startup, setup_walls)
