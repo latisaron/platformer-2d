@@ -10,25 +10,22 @@ mod setup_room;
 // mod setup_movable_block;
 // use setup_movable_block::{setup_controllable_block, keyboard_input};
 
-mod setup_chopping_block;
-use setup_chopping_block::{setup_chopping_block, setup_knife, move_objects, register_keystroke, cut_animation, ChoppingGameState};
+// mod setup_chopping_block;
+// use setup_chopping_block::{setup_chopping_block, setup_knife, move_objects, register_keystroke, cut_animation, ChoppingGameState};
+
+mod minigames;
+use minigames::knife_game::{KnifeMinigamePlugin};
+
+use crate::minigames::MinigameState;
 
 fn main() {
     App::new()
         .add_plugins(CustomWindowSetupPlugin)
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .add_plugins(RapierDebugRenderPlugin::default())
+        .insert_state(MinigameState::Knife)
+        .add_plugins(KnifeMinigamePlugin)
         .add_systems(Startup, setup_graphics)
-        .insert_state(ChoppingGameState::Playing)
-        .add_systems(Startup, (setup_chopping_block, setup_knife))
-        .add_systems(
-    Update,
-        (
-                    register_keystroke.run_if(in_state(ChoppingGameState::Playing)),
-                    cut_animation.run_if(in_state(ChoppingGameState::Cutting)),
-                    move_objects.run_if(in_state(ChoppingGameState::Playing))
-                ).chain()
-        )
         .run();
 
         // .add_systems(Startup, setup_walls)

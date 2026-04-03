@@ -1,5 +1,19 @@
 use bevy::{prelude::*};
 use std::time::Duration;
+use crate::minigames::knife_game::chopping_block::{create_chopping_block, ChoppingBlock};
+use crate::minigames::knife_game::{
+    SHADOW_START_X_POSITION_PERCENTAGE,
+    SHADOW_START_Y_POSITION,
+    SHADOW_WIDTH,
+    SHADOW_HEIGHT_PERNCETAGE,
+    MOVABLE_Z_INDEX,
+    KNIFE_X_OFFSET_TO_SHADOW,
+    KNIFE_WIDTH,
+    CHOPPING_BLOCK_WIDTH_PERCENTAGE,
+    CHOPPING_BLOCK_HEIGHT_PERCENTAGE,
+    MOVEMENT_SPEED,
+};
+use crate::minigames::shared::score::{Score, increase_score};
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ChoppingGameState {
@@ -8,12 +22,6 @@ pub enum ChoppingGameState {
     // Dead,
     Playing,
     Cutting
-}
-
-#[derive(Component)]
-pub struct ChoppingBlock{
-    width: f32,
-    center: f32,
 }
 
 #[derive(Component)]
@@ -31,33 +39,16 @@ pub enum Direction {
     Right,
 }
 
-
-const CHOPPING_BLOCK_WIDTH_PERCENTAGE: f32 = 0.7;
-const CHOPPING_BLOCK_HEIGHT_PERCENTAGE: f32 = 0.3;
-const BACKGROUND_Z_INDEX: f32 = 0.;
-const CUTTABLE_Z_INDEX: f32 = 1.;
-const MOVABLE_Z_INDEX: f32 = 2.;
-
-const KNIFE_WIDTH: f32 = 50.;
-const KNIFE_X_OFFSET_TO_SHADOW: f32 = 25.0;
-
-const SHADOW_START_X_POSITION_PERCENTAGE: f32 = 0.35;
-const SHADOW_START_Y_POSITION: f32 = 0.;
-const SHADOW_HEIGHT_PERNCETAGE: f32 = 0.3;
-const SHADOW_WIDTH: f32 = 3.;
-
-const MOVEMENT_SPEED: f32 = 400.;
-
-const IMAGE_WIDTH: f32 = 200.;
-const IMAGE_HEIGHT: f32 = 80.;
-
-
 #[derive(PartialEq, Eq, Debug)]
 enum KnifeDirection {
     Down,
     Up,
     Stationary,
 }
+
+
+#[derive(Component)]
+pub struct CleanupKnife;
 
 #[derive(Component)]
 pub struct AnimationConfig {
@@ -84,75 +75,6 @@ impl AnimationConfig {
     }
 }
 
-fn create_chopping_block(
-    commands: &mut Commands,
-    asset_server: &ResMut<AssetServer>,
-    chopping_block_width: f32,
-    chopping_block_center: f32,
-    chopping_block_height: f32,
-    reference_width: f32,
-) {
-    let image_center = ((chopping_block_center + reference_width  / 2.) / reference_width) * IMAGE_WIDTH; 
-    let image_height = IMAGE_HEIGHT;
-    let image_width = (chopping_block_width / reference_width) * IMAGE_WIDTH;
-
-    commands.spawn((
-        Sprite {
-            image: asset_server.load("knife_game/pula.png"),
-            rect: Some(Rect {
-                min: Vec2::new(
-                    image_center - image_width / 2.,
-                    0.,
-                ),
-                max: Vec2::new(
-                    image_center + image_width / 2.,
-                    image_height,
-                )
-            }),
-            custom_size: Some(Vec2::new(chopping_block_width, chopping_block_height)),
-            image_mode: SpriteImageMode::Auto,
-            ..default()
-        },
-        Transform::from_xyz(chopping_block_center, 0.0, CUTTABLE_Z_INDEX),
-        ChoppingBlock { width: chopping_block_width, center: chopping_block_center },
-    ));
-}
-
-pub fn setup_chopping_block(
-    mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    asset_server: ResMut<AssetServer>,
-    window: Single<& Window>,
-) {
-    let window_width = window.resolution.width();
-    let window_height = window.resolution.height();
-
-    let chopping_block_width = window_width * CHOPPING_BLOCK_WIDTH_PERCENTAGE;
-    let chopping_block_center = 0.;
-    let chopping_block_height = window_height * CHOPPING_BLOCK_HEIGHT_PERCENTAGE;
-
-    create_chopping_block(
-        &mut commands,
-        &asset_server,
-        chopping_block_width,
-        chopping_block_center,
-        chopping_block_height,
-        chopping_block_width,
-    );
-
-    let background_width = chopping_block_width * 1.2;
-    let background_height = chopping_block_height * 1.5;
-    commands.spawn((
-        Mesh2d(meshes.add(Rectangle::new(
-            background_width,
-            background_height,
-        ))),
-        MeshMaterial2d(materials.add(Color::srgb(0.82, 0.60, 0.35))),
-        Transform::from_xyz(0., 0.0, BACKGROUND_Z_INDEX),
-    ));
-}
-
 pub fn setup_knife(
     mut commands: Commands,
     mut materials: ResMut<Assets<ColorMaterial>>,
@@ -177,6 +99,7 @@ pub fn setup_knife(
         Movable{},
         Shadow{},
         Direction::Right,
+        CleanupKnife,
     ));
 
     let knife_x_start_position = shadow_x_start_position + KNIFE_X_OFFSET_TO_SHADOW;
@@ -203,6 +126,7 @@ pub fn setup_knife(
         Knife{},
         Direction::Right,
         knife_animation_config,
+        CleanupKnife,
     ));
 }
 
@@ -265,6 +189,7 @@ pub fn cut_animation(
     chopping_block: Single<(& ChoppingBlock, Entity)>,
     shadow: Single<&Transform, (With<Shadow>, Without<Knife>)>,
     knife: Single<(&mut AnimationConfig, &mut Sprite), (With<Knife>, Without<Shadow>)>,
+    mut score: Single<&mut Score>,
 ) { 
     let (mut config, mut sprite) = knife.into_inner();
     config.frame_timer.tick(time.delta());
@@ -302,6 +227,7 @@ pub fn cut_animation(
                         window.resolution.height() * CHOPPING_BLOCK_HEIGHT_PERCENTAGE,
                         window.resolution.width() * CHOPPING_BLOCK_WIDTH_PERCENTAGE,
                     );
+                    increase_score(score);
                 }
             } else {
                 atlas.index += 1;
@@ -318,5 +244,14 @@ pub fn cut_animation(
             }
             config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
         }
+    }
+}
+
+pub fn cleanup_knife(
+    mut commands: Commands,
+    cleanup_entities: Query<(Entity, &CleanupKnife)>,
+) {
+    for entities in cleanup_entities {
+        commands.entity(entities.0).despawn();
     }
 }
