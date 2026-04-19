@@ -21,7 +21,8 @@ pub enum ChoppingGameState {
     // Restart,
     // Dead,
     Playing,
-    Cutting
+    Cutting,
+    Lose,
 }
 
 #[derive(Component)]
@@ -75,13 +76,13 @@ impl AnimationConfig {
     }
 }
 
-pub fn setup_knife(
-    mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-    asset_server: ResMut<AssetServer>,
-    window: Single<& Window>,
+pub fn setup_knife_internal(
+    commands: &mut Commands,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    texture_atlas_layouts: &mut ResMut<Assets<TextureAtlasLayout>>,
+    asset_server: &mut ResMut<AssetServer>,
+    window: &Single<& Window>,
 ) {
     let width = window.resolution.width();
     let height = window.resolution.height();
@@ -128,6 +129,17 @@ pub fn setup_knife(
         knife_animation_config,
         CleanupKnife,
     ));
+}
+
+pub fn setup_knife(
+    mut commands: Commands,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    mut asset_server: ResMut<AssetServer>,
+    window: Single<& Window>,
+) {
+    setup_knife_internal(&mut commands, &mut materials, &mut meshes, &mut texture_atlas_layouts, &mut asset_server, &window);
 }
 
 pub fn move_objects(
@@ -184,12 +196,12 @@ pub fn cut_animation(
     time: ResMut<Time<Virtual>>,
     mut next_state: ResMut<NextState<ChoppingGameState>>,
     mut commands: Commands,
-    asset_server: ResMut<AssetServer>,
+    mut asset_server: ResMut<AssetServer>,
     window: Single<& Window>,
     chopping_block: Single<(& ChoppingBlock, Entity)>,
     shadow: Single<&Transform, (With<Shadow>, Without<Knife>)>,
     knife: Single<(&mut AnimationConfig, &mut Sprite), (With<Knife>, Without<Shadow>)>,
-    mut score: Single<&mut Score>,
+    score: Single<&mut Score>,
 ) { 
     let (mut config, mut sprite) = knife.into_inner();
     config.frame_timer.tick(time.delta());
@@ -205,7 +217,7 @@ pub fn cut_animation(
                 let shadow_x_pos = shadow.translation.x;
 
                 if shadow_x_pos < chopping_block_lwr || shadow_x_pos > chopping_block_upr {
-                    // game over, not impl so far
+                    next_state.set(ChoppingGameState::Lose);
                 } else {
                     let left_side_diff = shadow_x_pos - chopping_block_lwr;
                     let right_side_diff = chopping_block_upr - shadow_x_pos;
@@ -221,7 +233,7 @@ pub fn cut_animation(
                     commands.entity(chopping_block.1).despawn();
                     create_chopping_block(
                         &mut commands,
-                        &asset_server,
+                        &mut asset_server,
                         new_width,
                         new_center,
                         window.resolution.height() * CHOPPING_BLOCK_HEIGHT_PERCENTAGE,
@@ -254,4 +266,19 @@ pub fn cleanup_knife(
     for entities in cleanup_entities {
         commands.entity(entities.0).despawn();
     }
+}
+
+pub fn reset_knife(
+    mut commands: &mut Commands,
+    mut materials: &mut ResMut<Assets<ColorMaterial>>,
+    mut meshes: &mut ResMut<Assets<Mesh>>,
+    mut texture_atlas_layouts: &mut ResMut<Assets<TextureAtlasLayout>>,
+    mut asset_server: &mut ResMut<AssetServer>,
+    window: &Single<& Window>,
+    cleanup_entities: Query<(Entity, &CleanupKnife)>,
+) {
+    for entities in cleanup_entities {
+        commands.entity(entities.0).despawn();
+    }
+    setup_knife_internal(&mut commands, &mut materials, &mut meshes, &mut texture_atlas_layouts, &mut asset_server, &window);
 }

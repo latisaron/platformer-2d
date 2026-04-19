@@ -1,11 +1,23 @@
 pub mod knife;
 pub mod chopping_block;
+pub mod score;
+pub mod level;
+pub mod menu;
 
 use bevy::{prelude::*};
 use chopping_block::{setup_chopping_block, cleanup_chopping_block};
 use knife::{setup_knife, register_keystroke, cut_animation, move_objects, ChoppingGameState, cleanup_knife};
-use crate::minigames::shared::score::{setup_score, display_score,cleanup_score,};
-use crate::minigames::shared::menu::{setup_menu, listen_keystroke_game, listen_keystroke_menu, GameState};
+use score::setup_minigame_score;
+use level::setup_minigame_level;
+
+use crate::minigames::knife_game::menu::{continue_knife_game, exit_knife_game, restart_knife_game, setup_knife_menu, setup_lose_menu};
+use crate::minigames::shared::lose::lose_level;
+use crate::minigames::shared::menu::menu_action::MenuAction;
+use crate::minigames::shared::score::{cleanup_score};
+use crate::minigames::shared::level::{cleanup_level};
+use crate::minigames::shared::menu::state_management::{GameState, cleanup_menu};
+
+
 
 use crate::minigames::MinigameState;
 
@@ -33,35 +45,62 @@ pub struct KnifeMinigamePlugin;
 impl Plugin for KnifeMinigamePlugin {
     fn build(&self, app: &mut App) {
         app.insert_state(ChoppingGameState::Playing)
-            .insert_state(GameState::Play)
             .add_systems(
+                // setup things for the minigame
                 OnEnter(MinigameState::Knife),
-                (setup_chopping_block, setup_knife, setup_score),
+                (
+                    setup_minigame_level,
+                    setup_minigame_score,
+                    setup_chopping_block,
+                    setup_knife,
+                ).chain(),
             )
             .add_systems(
+                // delete things from the minigame after exiting
                 OnExit(MinigameState::Knife),
-                (cleanup_chopping_block, cleanup_knife, cleanup_score),
+                (
+                    cleanup_chopping_block,
+                    cleanup_knife,
+                    cleanup_score,
+                    cleanup_menu,
+                    cleanup_level,
+                ),
             )
             .add_systems(
+                OnEnter(ChoppingGameState::Lose),
+                lose_level,
+            )
+            .add_systems(
+                OnEnter(GameState::Menu),
+                (
+                    setup_knife_menu.run_if(in_state(ChoppingGameState::Playing)),
+                    setup_lose_menu.run_if(in_state(ChoppingGameState::Lose)),
+                )
+            )
+            .add_systems(
+                OnExit(GameState::Menu),
+                cleanup_menu,
+            )
+            .add_systems(
+                // minigame menu controls
+                Update,
+                (
+                    continue_knife_game.run_if(in_state(MenuAction::PreContinue))
+                        .run_if(in_state(MinigameState::Knife)),
+                    restart_knife_game.run_if(in_state(MenuAction::PreRestart))
+                        .run_if(in_state(MinigameState::Knife)),
+                    exit_knife_game.run_if(in_state(MenuAction::PreExit))
+                        .run_if(in_state(MinigameState::Knife)),
+                )
+            )
+            .add_systems(
+                // actual minigame stuff
     Update,
         (
                     register_keystroke.run_if(in_state(ChoppingGameState::Playing)),
                     cut_animation.run_if(in_state(ChoppingGameState::Cutting)),
                     move_objects.run_if(in_state(ChoppingGameState::Playing))
                 ).run_if(in_state(MinigameState::Knife))
-            )
-            .add_systems(
-                Startup,
-                setup_menu,
-            )
-            .add_systems(
-                Update,
-                listen_keystroke_game.run_if(in_state(GameState::Play))
-            )
-            .add_systems(
-                Update,
-                listen_keystroke_menu.run_if(in_state(GameState::Menu))
-            )
-            .add_systems(Update, display_score.run_if(in_state(MinigameState::Knife)));
+            );
     }
 }

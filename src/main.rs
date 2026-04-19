@@ -1,8 +1,5 @@
-use bevy::{prelude::*};
+use bevy::{window::WindowMode, prelude::*};
 use bevy_rapier2d::prelude::*;
-
-mod custom_window_setup_plugin;
-use custom_window_setup_plugin::CustomWindowSetupPlugin;
 
 mod setup_room;
 // use setup_room::{setup_walls, setup_bookshelf, setup_couch, setup_drawer, setup_floor};
@@ -15,17 +12,26 @@ mod setup_room;
 
 mod minigames;
 use minigames::knife_game::{KnifeMinigamePlugin};
+use minigames::shared::menu::state_management::{GameState};
 
-use crate::minigames::MinigameState;
+use crate::minigames::main::MainMinigamePlugin;
 
 fn main() {
     App::new()
-        .add_plugins(CustomWindowSetupPlugin)
+        .add_plugins(DefaultPlugins.set(
+            WindowPlugin {
+                primary_window: Some(Window {
+                    mode: WindowMode::Fullscreen(MonitorSelection::Primary, VideoModeSelection::Current),
+                    ..default()
+                }),
+                ..default()
+            }
+        ))
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .add_plugins(RapierDebugRenderPlugin::default())
-        .insert_state(MinigameState::Knife)
-        .add_plugins(KnifeMinigamePlugin)
         .add_systems(Startup, setup_graphics)
+        .add_plugins(MainMinigamePlugin)
+        .add_plugins(KnifeMinigamePlugin)
         .run();
 
         // .add_systems(Startup, setup_walls)
