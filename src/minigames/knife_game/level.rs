@@ -1,5 +1,5 @@
 use bevy::{prelude::*};
-use crate::minigames::shared::level::{Level};
+use crate::minigames::shared::level::{CleanupLevel, Level};
 
 pub fn knife_hash(level: usize) -> usize {
     match level {
@@ -13,10 +13,11 @@ pub fn knife_hash(level: usize) -> usize {
 pub fn setup_minigame_level(
     mut commands: Commands,
 ) {
-    commands.spawn(
+    commands.spawn((
         Level {
             current_value: 1,
             target_score: knife_hash(1),
-        }
-    );
+        },
+        CleanupLevel
+    ));
 }
