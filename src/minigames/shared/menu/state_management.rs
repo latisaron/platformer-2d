@@ -24,19 +24,6 @@ pub enum GameState {
     Play,
 }
 
-// this state is to define what kind of menu it is
-#[derive(States, Debug, Hash, Eq, PartialEq, Clone)]
-pub enum MenuType {
-    None, // not really in a menu
-    MainEscape, // this will be used as the default menu when hitting Escape in the main game
-    MinigameEscape, // this will be used as the default menu when hitting Escape in a minigame
-    Win, // this will be used in the case of winning the level
-    Lost, // this will be used in the case of losing the level
-}
-
-
-
-
 pub fn cleanup_menu(
     mut commands: Commands,
     cleanup_items: Query<Entity, With<CleanupMenu>>,

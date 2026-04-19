@@ -2,7 +2,7 @@ use bevy::{prelude::*};
 use super::level::Level;
 
 #[derive(Component)]
-pub struct Score(usize);
+pub struct Score(pub usize);
 
 #[derive(Component)]
 pub struct CleanupScore;

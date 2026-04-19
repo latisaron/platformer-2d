@@ -13,6 +13,8 @@ use crate::minigames::knife_game::{
     CHOPPING_BLOCK_HEIGHT_PERCENTAGE,
     MOVEMENT_SPEED,
 };
+use crate::minigames::shared::level::Level;
+use crate::minigames::shared::menu::menu_action::MenuAction;
 use crate::minigames::shared::score::{Score, increase_score};
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
@@ -22,7 +24,6 @@ pub enum ChoppingGameState {
     // Dead,
     Playing,
     Cutting,
-    Lose,
 }
 
 #[derive(Component)]
@@ -195,6 +196,7 @@ pub fn register_keystroke(
 pub fn cut_animation(
     time: ResMut<Time<Virtual>>,
     mut next_state: ResMut<NextState<ChoppingGameState>>,
+    mut menu_action_state: ResMut<NextState<MenuAction>>,
     mut commands: Commands,
     mut asset_server: ResMut<AssetServer>,
     window: Single<& Window>,
@@ -202,6 +204,7 @@ pub fn cut_animation(
     shadow: Single<&Transform, (With<Shadow>, Without<Knife>)>,
     knife: Single<(&mut AnimationConfig, &mut Sprite), (With<Knife>, Without<Shadow>)>,
     score: Single<&mut Score>,
+    level: Single<&Level>,
 ) { 
     let (mut config, mut sprite) = knife.into_inner();
     config.frame_timer.tick(time.delta());
@@ -217,7 +220,7 @@ pub fn cut_animation(
                 let shadow_x_pos = shadow.translation.x;
 
                 if shadow_x_pos < chopping_block_lwr || shadow_x_pos > chopping_block_upr {
-                    next_state.set(ChoppingGameState::Lose);
+                    menu_action_state.set(MenuAction::PreLose);
                 } else {
                     let left_side_diff = shadow_x_pos - chopping_block_lwr;
                     let right_side_diff = chopping_block_upr - shadow_x_pos;
@@ -239,7 +242,12 @@ pub fn cut_animation(
                         window.resolution.height() * CHOPPING_BLOCK_HEIGHT_PERCENTAGE,
                         window.resolution.width() * CHOPPING_BLOCK_WIDTH_PERCENTAGE,
                     );
-                    increase_score(score);
+                    if score.0 == level.target_score - 1 {
+                        menu_action_state.set(MenuAction::PreWin);
+                    } else  {
+                        increase_score(score);
+                    }
+                    
                 }
             } else {
                 atlas.index += 1;

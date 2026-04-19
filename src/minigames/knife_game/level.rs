@@ -1,25 +1,22 @@
 use bevy::{prelude::*};
 use crate::minigames::shared::level::{Level};
 
-fn knife_hash(level: usize) -> Option<usize> {
+pub fn knife_hash(level: usize) -> usize {
     match level {
-        1 => Some(3),
-        2 => Some(5),
-        3 => Some(7),
-        _ => None,
+        1 => 3,
+        2 => 5,
+        3 => 7,
+        _ => 1337,
     }
 }
 
 pub fn setup_minigame_level(
     mut commands: Commands,
 ) {
-    if let Some(target_score) = knife_hash(1) {
-        commands.spawn((
+    commands.spawn(
         Level {
             current_value: 1,
-            maximum_value: 3,
-            target_score: target_score,
-        },
-    ));
-    }
+            target_score: knife_hash(1),
+        }
+    );
 }

@@ -10,7 +10,7 @@ use knife::{setup_knife, register_keystroke, cut_animation, move_objects, Choppi
 use score::setup_minigame_score;
 use level::setup_minigame_level;
 
-use crate::minigames::knife_game::menu::{continue_knife_game, exit_knife_game, restart_knife_game, setup_knife_menu, setup_lose_menu};
+use crate::minigames::knife_game::menu::{continue_knife_game, exit_knife_game, restart_knife_game, setup_knife_menu, setup_lose_menu, setup_win_menu};
 use crate::minigames::shared::lose::lose_level;
 use crate::minigames::shared::menu::menu_action::MenuAction;
 use crate::minigames::shared::score::{cleanup_score};
@@ -20,6 +20,7 @@ use crate::minigames::shared::menu::state_management::{GameState, cleanup_menu};
 
 
 use crate::minigames::MinigameState;
+use crate::minigames::shared::win::win_level;
 
 pub const CHOPPING_BLOCK_WIDTH_PERCENTAGE: f32 = 0.7;
 pub const CHOPPING_BLOCK_HEIGHT_PERCENTAGE: f32 = 0.3;
@@ -67,14 +68,22 @@ impl Plugin for KnifeMinigamePlugin {
                 ),
             )
             .add_systems(
-                OnEnter(ChoppingGameState::Lose),
+                OnEnter(MenuAction::PreLose),
                 lose_level,
+            )
+            .add_systems(
+                OnEnter(MenuAction::PreWin),
+                win_level,
             )
             .add_systems(
                 OnEnter(GameState::Menu),
                 (
-                    setup_knife_menu.run_if(in_state(ChoppingGameState::Playing)),
-                    setup_lose_menu.run_if(in_state(ChoppingGameState::Lose)),
+                    setup_knife_menu.run_if(in_state(ChoppingGameState::Playing))
+                        .run_if(in_state(MinigameState::Knife)),
+                    setup_lose_menu.run_if(in_state(MenuAction::PreLose))
+                        .run_if(in_state(MinigameState::Knife)),
+                    setup_win_menu.run_if(in_state(MenuAction::PreWin))
+                        .run_if(in_state(MinigameState::Knife)),
                 )
             )
             .add_systems(

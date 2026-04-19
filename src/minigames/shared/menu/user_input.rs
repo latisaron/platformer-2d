@@ -57,13 +57,13 @@ pub fn listen_keystroke_menu(
     } else if keys.just_pressed(KeyCode::Enter) {
         if let Some(result) =  menu_items.into_iter().find(|(item, _)| item.position == query.position) {
             match result.0.menu_item_type {
-                MenuItemType::Continue => {
+                MenuItemType::Continue(_) => {
                     menu_action.set(MenuAction::PreContinue);
                 },
-                MenuItemType::Restart => {
+                MenuItemType::Restart(_) => {
                     menu_action.set(MenuAction::PreRestart);
                 },
-                MenuItemType::Exit => {
+                MenuItemType::Exit(_) => {
                     menu_action.set(MenuAction::PreExit);
                 },
             }

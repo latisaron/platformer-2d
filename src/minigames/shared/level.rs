@@ -6,7 +6,6 @@ pub struct CleanupLevel;
 #[derive(Component)]
 pub struct Level {
     pub current_value: usize,
-    pub maximum_value: usize,
     pub target_score: usize,
 }
 

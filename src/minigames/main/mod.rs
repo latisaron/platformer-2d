@@ -4,8 +4,9 @@ pub mod menu;
 use bevy::{prelude::*};
 
 use crate::GameState;
-use crate::minigames::main::menu::exit_game;
+use crate::minigames::main::menu::{exit_game, setup_main_menu, continue_main_game};
 use crate::minigames::shared::menu::menu_action::MenuAction;
+use crate::minigames::shared::menu::state_management::cleanup_menu;
 use crate::minigames::{MinigameState};
 use crate::minigames::main::click::choose_minigame;
 use crate::minigames::shared::menu::user_input::{listen_keystroke_game, listen_keystroke_menu};
@@ -40,9 +41,26 @@ impl Plugin for MainMinigamePlugin {
                 listen_keystroke_menu.run_if(in_state(GameState::Menu))
             )
             .add_systems(
+                OnEnter(GameState::Menu),
+                (
+                    setup_main_menu.run_if(in_state(MinigameState::Main)),
+                )
+            )
+            .add_systems(
+                // delete things from the minigame after exiting
+                OnExit(GameState::Menu),
+                (
+                            cleanup_menu.run_if(in_state(MinigameState::Main)),
+                        ),
+            )
+            .add_systems(
                 Update,
-                exit_game.run_if(in_state(MenuAction::PreExit))
-                    .run_if(in_state(MinigameState::Main))
+                (
+                    exit_game.run_if(in_state(MenuAction::PreExit))
+                        .run_if(in_state(MinigameState::Main)),
+                    continue_main_game.run_if(in_state(MenuAction::PreContinue))
+                        .run_if(in_state(MinigameState::Main)),
+                ),
             );
     }
 }

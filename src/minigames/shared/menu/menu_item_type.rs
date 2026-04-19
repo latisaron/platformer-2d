@@ -1,21 +1,21 @@
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum MenuItemType {
-    Continue,
-    Restart,
-    Exit,
+    Continue(String),
+    Restart(String),
+    Exit(String),
 }
 
 impl MenuItemType {
     pub fn text(&self) -> String {
         match self {
-            MenuItemType::Continue => {
-                String::from("Continue")
+            MenuItemType::Continue(string) => {
+                String::from(string.clone())
             },
-            MenuItemType::Restart => {
-                String::from("Restart")
+            MenuItemType::Restart(string) => {
+                String::from(string.clone())
             },
-            MenuItemType::Exit => {
-                String::from("Exit")
+            MenuItemType::Exit(string) => {
+                String::from(string.clone())
             },
         }
     }

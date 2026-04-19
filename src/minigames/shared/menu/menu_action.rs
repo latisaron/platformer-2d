@@ -9,4 +9,5 @@ pub enum MenuAction {
     PreExit,
     // auto-controlled by the game
     PreLose,
+    PreWin,
 }
