@@ -30,7 +30,9 @@ impl Plugin for MainMinigamePlugin {
             .add_systems(
             Update, 
             display_score.run_if(
-                in_state(MinigameState::Knife))
+                in_state(MinigameState::Knife)
+                            .or(in_state(MinigameState::Shoot))
+                    )
             )
             .add_systems(
                 Update,

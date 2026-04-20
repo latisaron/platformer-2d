@@ -7,5 +7,7 @@ pub fn choose_minigame(
 ) {
     if keys.just_pressed(KeyCode::KeyK) {
         current_minigame.set(MinigameState::Knife);
+    } else if keys.just_pressed(KeyCode::KeyL) {
+        current_minigame.set(MinigameState::Shoot);
     }
 }

@@ -1,6 +1,7 @@
 pub mod main;
 pub mod knife_game;
 pub mod shared;
+pub mod shooting_game;
 
 use bevy::{prelude::*};
 
@@ -8,4 +9,5 @@ use bevy::{prelude::*};
 pub enum MinigameState {
     Main,
     Knife,
+    Shoot,
 }
