@@ -2,12 +2,22 @@ use bevy::{prelude::*};
 
 use crate::minigames::{
     MinigameState,
-    shooting_game::target::{
-        advance_expire_and_despawn,
-        move_targets,
-        maintain_intended_target_count
-    },
-    shooting_game::level::{setup_minigame_level},
+    shared::menu::state_management::GameState,
+    shooting_game::{
+        gun::{
+            setup_cursor_icon,
+            hide_cursor,
+            show_cursor,
+        },
+        level::setup_minigame_level,
+        score::setup_minigame_score,
+        target::{
+            advance_expire_and_despawn,
+            maintain_intended_target_count,
+            listen_for_shots_in_target,
+            move_targets,
+        },
+    }
 };
 
 pub mod environment;
@@ -25,15 +35,26 @@ impl Plugin for ShootingMinigamePlugin {
             OnEnter(MinigameState::Shoot),
                 (
                     setup_minigame_level,
-                )
+                    setup_minigame_score,
+                    setup_cursor_icon,
+                ).chain()
+            )
+            .add_systems(
+                OnEnter(GameState::Menu),
+                        hide_cursor.run_if(in_state(MinigameState::Shoot))
+            )
+            .add_systems(
+                OnExit(GameState::Menu),
+                        show_cursor.run_if(in_state(MinigameState::Shoot))
             )
             .add_systems(
                 Update,
                 (
                     maintain_intended_target_count.run_if(in_state(MinigameState::Shoot)),
                     advance_expire_and_despawn.run_if(in_state(MinigameState::Shoot)),
+                    listen_for_shots_in_target.run_if(in_state(MinigameState::Shoot)),
                     move_targets.run_if(in_state(MinigameState::Shoot)),
-                )
+                ).chain()
             );
     
     }

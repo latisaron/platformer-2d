@@ -32,7 +32,6 @@ pub fn continue_main_game(
     mut menu_action_state: ResMut<NextState<MenuAction>>,
     mut game_state: ResMut<NextState<GameState>>,
 ) {
-    println!("continuning main game???");
     menu_action_state.set(MenuAction::None);
     game_state.set(GameState::Play);
 }

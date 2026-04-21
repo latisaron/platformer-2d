@@ -1,6 +1,8 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use rand::Rng;
 
+use crate::minigames::shared::score::{Score, increase_score, decrease_score};
+
 const TARGET_WIDTH: f32 = 100.;
 const TARGET_HEIGHT: f32 = 200.;
 const TARGET_Z_INDEX: f32 = 0.;
@@ -10,10 +12,10 @@ const RAILS_COUNT: u32 = 3;
 const MIN_TARGET_LIFETIME: f32 = 3.;
 const MAX_TARGET_LIFETIME: f32 = 10.;
 
-const MIN_TARGET_SPEED: f32 = 200.;
-const MAX_TARGET_SPEED: f32 = 800.;
+const MIN_TARGET_SPEED: f32 = 100.;
+const MAX_TARGET_SPEED: f32 = 400.;
 
-const MAX_TARGET_COUNT: usize = 8;
+const MAX_TARGET_COUNT: usize = 10;
 
 const SWITCH_DIRECTION_PERCENTAGE: u32 = 99;
 
@@ -30,16 +32,24 @@ pub struct Target {
     current_direction: TargetDirection,
     movement_speed: f32,
     remaining_lifetime: f32,
+    friendly: bool,
 }
 
 impl Target {
+    fn within_self_bounds(&self, x: f32, y: f32) -> bool {
+        self.current_x - (TARGET_WIDTH / 2.) <= x &&
+            x <= self.current_x + (TARGET_WIDTH / 2.) &&
+            self.current_y - (TARGET_HEIGHT / 2.) <= y &&
+            y <= self.current_y + (TARGET_HEIGHT / 2.)
+    }
+
     fn random_anything(lwr_limit: u32, upr_limit: u32) -> u32 {
         let mut rng = rand::thread_rng();
         rng.gen_range(lwr_limit..upr_limit)
     }
 
     pub fn random_direction() -> TargetDirection {
-        match (Self::random_anything(0,2)) {
+        match Self::random_anything(0,2) {
             0 => TargetDirection::Left,
             1 => TargetDirection::Right,
             _ => TargetDirection::Left, // impossible to get to lol
@@ -70,6 +80,10 @@ impl Target {
     pub fn random_speed() -> f32 {
         Self::random_anything(MIN_TARGET_SPEED as u32, MAX_TARGET_SPEED as u32) as f32
     }
+
+    pub fn random_friendly() -> bool {
+        Self::random_anything(0,10) < 8
+    }
 }
 
 pub fn spawn_individual_target(
@@ -83,13 +97,20 @@ pub fn spawn_individual_target(
         let max_height = window.resolution.height();
         let current_x = Target::random_x_location(max_width);
         let current_y = Target::random_y_location(max_height);
+        let friendly = Target::random_friendly();
+        let color =
+            if friendly {
+                Color::srgb(0.0, 0.60, 0.35)
+            } else {
+                Color::srgb(0.6, 0.0, 0.35)
+            };
 
         commands.spawn((
             Mesh2d(meshes.add(Rectangle::new(
                 TARGET_WIDTH,
                 TARGET_HEIGHT,
             ))),
-            MeshMaterial2d(materials.add(Color::srgb(0.82, 0.60, 0.35))),
+            MeshMaterial2d(materials.add(color)),
             Transform::from_xyz(current_x, current_y, TARGET_Z_INDEX),
             Target {
                 current_x,
@@ -97,6 +118,7 @@ pub fn spawn_individual_target(
                 current_direction: Target::random_direction(),
                 movement_speed: Target::random_speed(),
                 remaining_lifetime: Target::random_lifetime(),
+                friendly: friendly,
             },
         ));
     }
@@ -168,6 +190,33 @@ pub fn move_targets(
                 }
             }
         };
+        target.current_x = transform.translation.x;
+        target.current_y = transform.translation.y;
         
+    }
+}
+
+pub fn listen_for_shots_in_target(
+    window: Single<&Window, With<PrimaryWindow>>,
+    keys: Res<ButtonInput<MouseButton>>,
+    mut commands: Commands,
+    mut score: Single<&mut Score>,
+    targets_query: Query<(&Target, Entity)>, 
+) {
+    if keys.just_pressed(MouseButton::Left) {
+        if let Some(position) = window.cursor_position() {
+            let x =  position[0] - window.width() / 2.0;
+            let y = -(position[1] - window.height() / 2.0);
+            for (target, entity) in targets_query {
+                if target.within_self_bounds(x, y) {
+                    if target.friendly {
+                        decrease_score(&mut score);
+                    } else {
+                        increase_score(&mut score);
+                    }
+                    commands.entity(entity).despawn();
+                }
+            }
+        }
     }
 }

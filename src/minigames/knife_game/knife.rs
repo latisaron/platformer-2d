@@ -203,7 +203,7 @@ pub fn cut_animation(
     chopping_block: Single<(& ChoppingBlock, Entity)>,
     shadow: Single<&Transform, (With<Shadow>, Without<Knife>)>,
     knife: Single<(&mut AnimationConfig, &mut Sprite), (With<Knife>, Without<Shadow>)>,
-    score: Single<&mut Score>,
+    mut score: Single<&mut Score>,
     level: Single<&Level>,
 ) { 
     let (mut config, mut sprite) = knife.into_inner();
@@ -245,7 +245,7 @@ pub fn cut_animation(
                     if score.0 == level.target_score - 1 {
                         menu_action_state.set(MenuAction::PreWin);
                     } else  {
-                        increase_score(score);
+                        increase_score(&mut score);
                     }
                     
                 }

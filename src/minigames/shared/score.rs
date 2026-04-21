@@ -42,9 +42,17 @@ pub fn setup_score(
 }
 
 pub fn increase_score(
-    mut score: Single<&mut Score>,
+    score: &mut Single<&mut Score>,
 ) {
     score.0 += 1;
+}
+
+pub fn decrease_score(
+    score: &mut Single<&mut Score>,
+) {
+    if score.0 > 0 {
+        score.0 -= 1;   
+    }
 }
 
 pub fn reset_score(
