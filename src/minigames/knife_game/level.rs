@@ -17,6 +17,7 @@ pub fn setup_minigame_level(
         Level {
             current_value: 1,
             target_score: knife_hash(1),
+            target_time: None
         },
         CleanupLevel
     ));

@@ -7,6 +7,7 @@ pub struct CleanupLevel;
 pub struct Level {
     pub current_value: usize,
     pub target_score: usize,
+    pub target_time: Option<usize>,
 }
 
 pub fn cleanup_level(
