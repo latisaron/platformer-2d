@@ -67,10 +67,10 @@ impl Target {
     pub fn random_y_location(max_height: f32) -> f32 {
         let rail_index = Self::random_anything(0, RAILS_COUNT) as f32;
 
-        let spacing = max_height / (RAILS_COUNT as f32 + 1.0);
+        let spacing = max_height / (RAILS_COUNT as f32 + 1.5);
         let half = max_height / 2.0;
 
-        -half + spacing * (rail_index + 1.0)
+        -half + spacing * (rail_index + 2.0)
     }
 
     pub fn random_lifetime() -> f32 {
@@ -82,7 +82,7 @@ impl Target {
     }
 
     pub fn random_friendly() -> bool {
-        Self::random_anything(0,10) < 8
+        Self::random_anything(0,10) >= 8
     }
 }
 

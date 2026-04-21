@@ -8,6 +8,7 @@ use crate::minigames::{
             setup_cursor_icon,
             hide_cursor,
             show_cursor,
+            setup_gun,
         },
         level::setup_minigame_level,
         score::setup_minigame_score,
@@ -37,6 +38,7 @@ impl Plugin for ShootingMinigamePlugin {
                     setup_minigame_level,
                     setup_minigame_score,
                     setup_cursor_icon,
+                    setup_gun,
                 ).chain()
             )
             .add_systems(
