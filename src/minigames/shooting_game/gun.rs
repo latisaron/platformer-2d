@@ -3,6 +3,8 @@ use bevy::{
     window::{PrimaryWindow, CursorIcon, CustomCursor, CustomCursorImage, CursorOptions},
 };
 
+use crate::camera::MainCamera;
+
 const GUN_HEIGHT: f32 = 400.0;
 const GUN_WIDTH: f32 = 100.0;
 const GUN_Z_INDEX: f32 = 1.;
@@ -54,5 +56,35 @@ pub fn setup_gun(
             Transform::from_xyz(0., -height/2., GUN_Z_INDEX),
             Gun
         ));
+    }
+}
+
+pub fn gun_follows_mouse(
+    mut query: Query<&mut Transform, With<Gun>>,
+    windows: Query<&Window>,
+    camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+) {
+
+    if let Ok(window) = windows.single() {
+        if let Ok((camera, camera_transform)) = camera_q.single() {
+            if let Some(world_position) = window
+                .cursor_position()
+                .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor).ok())
+            {
+                // Get the player translation in 2D
+    
+                for mut gun_transform in &mut query {
+                    // Get the vector from the enemy ship to the player ship in 2D and normalize it.
+                    let to_player = (world_position - gun_transform.translation.xy()).normalize();
+
+                    // Get the quaternion to rotate from the initial enemy facing direction to the direction
+                    // facing the player
+                    let rotate_to_player = Quat::from_rotation_arc(Vec3::Y, to_player.extend(0.));
+
+                    // Rotate the enemy to face the player
+                    gun_transform.rotation = rotate_to_player;
+                }
+            }
+        }
     }
 }

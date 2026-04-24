@@ -9,6 +9,7 @@ use crate::minigames::{
             hide_cursor,
             show_cursor,
             setup_gun,
+            gun_follows_mouse,
         },
         level::setup_minigame_level,
         score::setup_minigame_score,
@@ -56,6 +57,7 @@ impl Plugin for ShootingMinigamePlugin {
                     advance_expire_and_despawn.run_if(in_state(MinigameState::Shoot)),
                     listen_for_shots_in_target.run_if(in_state(MinigameState::Shoot)),
                     move_targets.run_if(in_state(MinigameState::Shoot)),
+                    gun_follows_mouse.run_if(in_state(MinigameState::Shoot)),
                 ).chain()
             );
     
