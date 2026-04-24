@@ -19,6 +19,15 @@ pub fn target_time_hash(level: usize) -> usize {
     }
 }
 
+pub fn bullet_hash(level: usize) -> usize {
+    match level {
+        1 => 30,
+        2 => 35,
+        3 => 40,
+        _ => 133333337,
+    }
+}
+
 pub fn setup_minigame_level(
     mut commands: Commands,
 ) {
@@ -27,6 +36,7 @@ pub fn setup_minigame_level(
             current_value: 1,
             target_score: target_score_hash(1),
             target_time: Some(target_time_hash(1)),
+            bullets: Some(bullet_hash(1)),
         },
         CleanupLevel
     ));

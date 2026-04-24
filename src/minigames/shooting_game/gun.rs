@@ -1,21 +1,23 @@
 use bevy::{
     prelude::*,
-    window::{PrimaryWindow, CursorIcon, CustomCursor, CustomCursorImage, CursorOptions},
+    window::{PrimaryWindow, CursorIcon, CustomCursor, CustomCursorImage, CursorOptions, WindowFocused},
 };
 
-use crate::camera::MainCamera;
+use crate::{camera::MainCamera, minigames::shared::level::Level};
 
 const GUN_HEIGHT: f32 = 400.0;
 const GUN_WIDTH: f32 = 100.0;
 const GUN_Z_INDEX: f32 = 1.;
 
 #[derive(Component)]
-pub struct Gun;
+pub struct Gun {
+    pub bullets: usize,
+}
 
 pub fn setup_cursor_icon(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    window: Single<Entity, With<Window>>,
+    window: Single<Entity, With<PrimaryWindow>>,
 ) {
     commands.entity(*window).insert((
         CursorIcon::Custom(CustomCursor::Image(CustomCursorImage {
@@ -31,12 +33,13 @@ pub fn setup_cursor_icon(
     ));
 }
 
-pub fn hide_cursor(mut cursor_options: Single<&mut CursorOptions>) {
-    cursor_options.visible = false;
-}
-
-pub fn show_cursor(mut cursor_options: Single<&mut CursorOptions>) {
-    cursor_options.visible = true;
+pub fn handle_window_focus(
+    mut focus_events: MessageReader<WindowFocused>,
+    mut cursor_options: Single<&mut CursorOptions>,
+) {
+    for event in focus_events.read() {
+        cursor_options.visible = !event.focused;
+    }
 }
 
 pub fn setup_gun(
@@ -44,6 +47,7 @@ pub fn setup_gun(
     mut commands: Commands,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
+    level: Single<&Level>,
 ) {
     if let Ok(window) = window.single() {
         let height = window.resolution.height();
@@ -54,7 +58,7 @@ pub fn setup_gun(
             ))),
             MeshMaterial2d(materials.add(Color::srgb(0.5, 0.5, 0.35))),
             Transform::from_xyz(0., -height/2., GUN_Z_INDEX),
-            Gun
+            Gun { bullets: level.bullets.unwrap() },
         ));
     }
 }
@@ -86,5 +90,14 @@ pub fn gun_follows_mouse(
                 }
             }
         }
+    }
+}
+
+pub fn decrease_bullets(gun_mut_ref: &mut Single<&mut Gun>) -> Option<usize> {
+    if gun_mut_ref.bullets > 0 {
+        gun_mut_ref.bullets -= 1;
+        Some(gun_mut_ref.bullets)
+    } else {
+        None
     }
 }

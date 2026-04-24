@@ -4,21 +4,13 @@ use crate::minigames::{
     MinigameState,
     shared::menu::state_management::GameState,
     shooting_game::{
-        gun::{
-            setup_cursor_icon,
-            hide_cursor,
-            show_cursor,
-            setup_gun,
-            gun_follows_mouse,
-        },
-        level::setup_minigame_level,
-        score::setup_minigame_score,
-        target::{
-            advance_expire_and_despawn,
-            maintain_intended_target_count,
-            listen_for_shots_in_target,
-            move_targets,
-        },
+        bullets_display::{
+            display_bullets, setup_bullets
+        }, gun::{
+            gun_follows_mouse, handle_window_focus, setup_cursor_icon, setup_gun,
+        }, level::setup_minigame_level, score::setup_minigame_score, target::{
+            advance_expire_and_despawn, listen_for_shots_in_target, maintain_intended_target_count, move_targets
+        }
     }
 };
 
@@ -28,6 +20,7 @@ pub mod level;
 pub mod menu;
 pub mod score;
 pub mod target;
+pub mod bullets_display;
 
 pub struct ShootingMinigamePlugin;
 
@@ -40,24 +33,19 @@ impl Plugin for ShootingMinigamePlugin {
                     setup_minigame_score,
                     setup_cursor_icon,
                     setup_gun,
+                    setup_bullets,
                 ).chain()
-            )
-            .add_systems(
-                OnEnter(GameState::Menu),
-                        hide_cursor.run_if(in_state(MinigameState::Shoot))
-            )
-            .add_systems(
-                OnExit(GameState::Menu),
-                        show_cursor.run_if(in_state(MinigameState::Shoot))
             )
             .add_systems(
                 Update,
                 (
+                    handle_window_focus.run_if(in_state(MinigameState::Shoot)),
                     maintain_intended_target_count.run_if(in_state(MinigameState::Shoot)),
                     advance_expire_and_despawn.run_if(in_state(MinigameState::Shoot)),
                     listen_for_shots_in_target.run_if(in_state(MinigameState::Shoot)),
                     move_targets.run_if(in_state(MinigameState::Shoot)),
                     gun_follows_mouse.run_if(in_state(MinigameState::Shoot)),
+                    display_bullets.run_if(in_state(MinigameState::Shoot)),
                 ).chain()
             );
     

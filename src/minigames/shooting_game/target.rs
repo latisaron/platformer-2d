@@ -1,7 +1,17 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use rand::Rng;
 
-use crate::minigames::shared::score::{Score, increase_score, decrease_score};
+use crate::minigames::{
+    shared::score::{
+        Score,
+        decrease_score,
+        increase_score,
+    },
+    shooting_game::gun::{
+        Gun,
+        decrease_bullets,
+    },
+};
 
 const TARGET_WIDTH: f32 = 100.;
 const TARGET_HEIGHT: f32 = 200.;
@@ -201,7 +211,8 @@ pub fn listen_for_shots_in_target(
     keys: Res<ButtonInput<MouseButton>>,
     mut commands: Commands,
     mut score: Single<&mut Score>,
-    targets_query: Query<(&Target, Entity)>, 
+    targets_query: Query<(&Target, Entity)>,
+    mut gun: Single<&mut Gun>,
 ) {
     if keys.just_pressed(MouseButton::Left) {
         if let Some(position) = window.cursor_position() {
@@ -218,5 +229,9 @@ pub fn listen_for_shots_in_target(
                 }
             }
         }
+        if decrease_bullets(&mut gun).is_none() {
+            // game over - not impl 
+        }
     }
 }
+
