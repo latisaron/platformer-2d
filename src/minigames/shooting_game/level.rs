@@ -12,18 +12,18 @@ pub fn target_score_hash(level: usize) -> usize {
 
 pub fn target_time_hash(level: usize) -> usize {
     match level {
-        1 => 15,
-        2 => 10,
-        3 => 9,
+        1 => 20,
+        2 => 30,
+        3 => 45,
         _ => 133337,
     }
 }
 
 pub fn bullet_hash(level: usize) -> usize {
     match level {
-        1 => 30,
-        2 => 35,
-        3 => 40,
+        1 => 50,
+        2 => 55,
+        3 => 61,
         _ => 133333337,
     }
 }
