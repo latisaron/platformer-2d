@@ -33,11 +33,12 @@ pub fn setup_cursor_icon(
     ));
 }
 
-pub fn cursor_visibility_system(
-    window: Single<&Window, With<PrimaryWindow>>,
-    mut cursor_options: Single<&mut CursorOptions>,
-) {
-    cursor_options.visible = window.focused;
+pub fn hide_cursor(mut cursor_options: Single<&mut CursorOptions>) {
+    cursor_options.visible = false;
+}
+
+pub fn show_cursor(mut cursor_options: Single<&mut CursorOptions>) {
+    cursor_options.visible = true;
 }
 
 pub fn setup_gun(

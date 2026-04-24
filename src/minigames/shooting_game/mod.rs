@@ -6,7 +6,7 @@ use crate::minigames::{
         bullets_display::{
             display_bullets, setup_bullets
         }, gun::{
-            gun_follows_mouse, cursor_visibility_system, setup_cursor_icon, setup_gun,
+            gun_follows_mouse, show_cursor, hide_cursor, setup_cursor_icon, setup_gun,
         }, level::setup_minigame_level, score::setup_minigame_score, target::{
             advance_expire_and_despawn, listen_for_shots_in_target, maintain_intended_target_count, move_targets
         }
@@ -36,9 +36,16 @@ impl Plugin for ShootingMinigamePlugin {
                 ).chain()
             )
             .add_systems(
+                OnEnter(MinigameState::Shoot),
+                show_cursor,
+            )
+            .add_systems(
+                OnExit(MinigameState::Shoot),
+                hide_cursor,
+            )
+            .add_systems(
                 Update,
                 (
-                    cursor_visibility_system.run_if(in_state(MinigameState::Shoot)),
                     maintain_intended_target_count.run_if(in_state(MinigameState::Shoot)),
                     advance_expire_and_despawn.run_if(in_state(MinigameState::Shoot)),
                     listen_for_shots_in_target.run_if(in_state(MinigameState::Shoot)),
