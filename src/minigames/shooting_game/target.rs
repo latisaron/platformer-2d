@@ -13,8 +13,8 @@ use crate::minigames::{
     },
 };
 
-const TARGET_WIDTH: f32 = 100.;
-const TARGET_HEIGHT: f32 = 200.;
+const TARGET_WIDTH_INTERVAL: (f32, f32) = (50., 100.);
+const TARGET_HEIGHT_INTERVAL: (f32, f32) = (100., 200.);
 const TARGET_Z_INDEX: f32 = 0.;
 
 const RAILS_COUNT: u32 = 3;
@@ -39,6 +39,8 @@ pub enum TargetDirection {
 pub struct Target {
     pub current_x: f32,
     pub current_y: f32,
+    width: f32,
+    height: f32,
     current_direction: TargetDirection,
     movement_speed: f32,
     remaining_lifetime: f32,
@@ -47,13 +49,18 @@ pub struct Target {
 
 impl Target {
     fn within_self_bounds(&self, x: f32, y: f32) -> bool {
-        self.current_x - (TARGET_WIDTH / 2.) <= x &&
-            x <= self.current_x + (TARGET_WIDTH / 2.) &&
-            self.current_y - (TARGET_HEIGHT / 2.) <= y &&
-            y <= self.current_y + (TARGET_HEIGHT / 2.)
+        self.current_x - (self.width / 2.) <= x &&
+            x <= self.current_x + (self.width / 2.) &&
+            self.current_y - (self.height / 2.) <= y &&
+            y <= self.current_y + (self.height / 2.)
     }
 
     fn random_anything(lwr_limit: u32, upr_limit: u32) -> u32 {
+        let mut rng = rand::thread_rng();
+        rng.gen_range(lwr_limit..upr_limit)
+    }
+
+    fn random_anything_f32(lwr_limit: f32, upr_limit: f32) -> f32 {
         let mut rng = rand::thread_rng();
         rng.gen_range(lwr_limit..upr_limit)
     }
@@ -66,8 +73,16 @@ impl Target {
         }
     }
 
-    pub fn random_x_location(max_width: f32) -> f32 {
-        let half = (max_width - TARGET_WIDTH) / 2.0;
+    pub fn random_target_height() -> f32 {
+        Self::random_anything_f32(TARGET_HEIGHT_INTERVAL.0, TARGET_HEIGHT_INTERVAL.1)
+    }
+
+    pub fn random_target_width() -> f32 {
+        Self::random_anything_f32(TARGET_WIDTH_INTERVAL.0, TARGET_WIDTH_INTERVAL.1)
+    }
+
+    pub fn random_x_location(max_width: f32, target_width: f32) -> f32 {
+        let half = (max_width - target_width) / 2.0;
 
         let value = Self::random_anything(0, (half * 2.0) as u32) as f32;
 
@@ -105,7 +120,9 @@ pub fn spawn_individual_target(
     if let Ok(window) = window.single() {
         let max_width = window.resolution.width();
         let max_height = window.resolution.height();
-        let current_x = Target::random_x_location(max_width);
+        let target_width = Target::random_target_width();
+        let target_height = Target::random_target_height();
+        let current_x = Target::random_x_location(max_width, target_width);
         let current_y = Target::random_y_location(max_height);
         let friendly = Target::random_friendly();
         let color =
@@ -117,14 +134,16 @@ pub fn spawn_individual_target(
 
         commands.spawn((
             Mesh2d(meshes.add(Rectangle::new(
-                TARGET_WIDTH,
-                TARGET_HEIGHT,
+                target_width,
+                target_height,
             ))),
             MeshMaterial2d(materials.add(color)),
             Transform::from_xyz(current_x, current_y, TARGET_Z_INDEX),
             Target {
                 current_x,
                 current_y,
+                width: target_width,
+                height: target_height,
                 current_direction: Target::random_direction(),
                 movement_speed: Target::random_speed(),
                 remaining_lifetime: Target::random_lifetime(),
@@ -169,9 +188,9 @@ pub fn move_targets(
     window: Single<& Window>,
     targets_query: Query<(&mut Transform, &mut Target)>
 ) {
-    let max_width = (window.resolution.width() - TARGET_WIDTH) / 2.;
     let passed_time = time.delta_secs();
     for (mut transform, mut target) in targets_query {
+        let max_width = (window.resolution.width() - target.width) / 2.;
         let random_value = Target::random_anything(0, 100);
         if random_value >= SWITCH_DIRECTION_PERCENTAGE {
             target.current_direction =

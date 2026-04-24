@@ -33,13 +33,11 @@ pub fn setup_cursor_icon(
     ));
 }
 
-pub fn handle_window_focus(
-    mut focus_events: MessageReader<WindowFocused>,
+pub fn cursor_visibility_system(
+    window: Single<&Window, With<PrimaryWindow>>,
     mut cursor_options: Single<&mut CursorOptions>,
 ) {
-    for event in focus_events.read() {
-        cursor_options.visible = !event.focused;
-    }
+    cursor_options.visible = window.focused;
 }
 
 pub fn setup_gun(
