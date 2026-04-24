@@ -13,7 +13,7 @@ use crate::minigames::{
     },
 };
 
-const TARGET_WIDTH_INTERVAL: (f32, f32) = (50., 100.);
+const TARGET_WIDTH_INTERVAL: (f32, f32) = (100., 200.);
 const TARGET_HEIGHT_INTERVAL: (f32, f32) = (100., 200.);
 const TARGET_Z_INDEX: f32 = 0.;
 
