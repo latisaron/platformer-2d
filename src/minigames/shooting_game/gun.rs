@@ -107,10 +107,11 @@ pub fn gun_follows_mouse(
 }
 
 pub fn decrease_bullets(gun_mut_ref: &mut Single<&mut Gun>) -> Option<usize> {
-    if gun_mut_ref.bullets > 0 {
+    if gun_mut_ref.bullets > 1 {
         gun_mut_ref.bullets -= 1;
         Some(gun_mut_ref.bullets)
     } else {
+        gun_mut_ref.bullets -= 1;
         None
     }
 }
