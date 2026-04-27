@@ -8,8 +8,7 @@ use crate::minigames::{
         increase_score,
     }},
     shooting_game::{LossState, gun::{
-        Gun,
-        decrease_bullets,
+        Gun, GunAnimationState, decrease_bullets
     }},
 };
 
@@ -28,6 +27,9 @@ const MAX_TARGET_SPEED: f32 = 400.;
 const MAX_TARGET_COUNT: usize = 10;
 
 const SWITCH_DIRECTION_PERCENTAGE: u32 = 99;
+
+const POSSIBLE_FRIENDS: [&str; 3] = ["shooting_game/green.png", "shooting_game/green.png", "shooting_game/green.png"];
+const POSSIBLE_ENEMIES: [&str; 3] = ["shooting_game/red.png", "shooting_game/red.png", "shooting_game/red.png"];
 
 #[derive(Eq, PartialEq, Debug)]
 pub enum TargetDirection {
@@ -109,6 +111,14 @@ impl Target {
     pub fn random_friendly() -> bool {
         Self::random_anything(0,10) >= 8
     }
+
+    pub fn random_friend() -> String {
+        String::from(POSSIBLE_FRIENDS[Self::random_anything(0, 2) as usize])
+    }
+
+    pub fn random_enemy() -> String {
+        String::from(POSSIBLE_ENEMIES[Self::random_anything(0, 2) as usize])
+    }
 }
 
 #[derive(Component)]
@@ -117,8 +127,7 @@ pub struct TargetCleanup;
 pub fn spawn_individual_target(
     window: &Query<&Window, With<PrimaryWindow>>,
     commands: &mut Commands,
-    materials: &mut ResMut<Assets<ColorMaterial>>,
-    meshes: &mut ResMut<Assets<Mesh>>,
+    asset_server: &mut ResMut<AssetServer>,
 ) {
     if let Ok(window) = window.single() {
         let max_width = window.resolution.width();
@@ -128,19 +137,20 @@ pub fn spawn_individual_target(
         let current_x = Target::random_x_location(max_width, target_width);
         let current_y = Target::random_y_location(max_height);
         let friendly = Target::random_friendly();
-        let color =
+        let asset_string =
             if friendly {
-                Color::srgb(0.0, 0.60, 0.35)
+                Target::random_friend()
             } else {
-                Color::srgb(0.6, 0.0, 0.35)
+                Target::random_enemy()
             };
 
         commands.spawn((
-            Mesh2d(meshes.add(Rectangle::new(
-                target_width,
-                target_height,
-            ))),
-            MeshMaterial2d(materials.add(color)),
+            Sprite {
+                image: asset_server.load(&asset_string),
+                custom_size: Some(Vec2::new(target_width, target_height)),
+                image_mode: SpriteImageMode::Auto,
+                ..default()
+            },
             Transform::from_xyz(current_x, current_y, TARGET_Z_INDEX),
             Target {
                 current_x,
@@ -160,13 +170,12 @@ pub fn spawn_individual_target(
 pub fn maintain_intended_target_count(
     window: Query<&Window, With<PrimaryWindow>>,
     mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
+    mut asset_server: ResMut<AssetServer>,
     targets_query: Query<&Target>,
 ) {
     for _ in targets_query.iter().len()..MAX_TARGET_COUNT {
         if Target::random_anything(0, 100) >= 98 {
-            spawn_individual_target(&window, &mut commands, &mut materials, &mut meshes);
+            spawn_individual_target(&window, &mut commands, &mut asset_server);
         }
     }
 }
@@ -239,8 +248,10 @@ pub fn listen_for_shots_in_target(
     mut gun: Single<&mut Gun>,
     mut menu_action_state: ResMut<NextState<MenuAction>>,
     mut loss_state: ResMut<NextState<LossState>>,
+    mut gun_animation_state: ResMut<NextState<GunAnimationState>>,
 ) {
     if keys.just_pressed(MouseButton::Left) {
+        gun_animation_state.set(GunAnimationState::External);
         if let Some(position) = window.cursor_position() {
             let x =  position[0] - window.width() / 2.0;
             let y = -(position[1] - window.height() / 2.0);

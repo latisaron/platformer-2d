@@ -100,8 +100,8 @@ pub fn restart_shoot_game(
     mut menu_action_state: ResMut<NextState<MenuAction>>,
     mut game_state: ResMut<NextState<GameState>>,
     // shared restart actions
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
+    asset_server: Res<AssetServer>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     mut commands: Commands,
     // score
     score: Single<&mut Score>,
@@ -115,7 +115,7 @@ pub fn restart_shoot_game(
     cleanup_timer_entities: Query<(Entity, &TimerCleanup)>,
 
 ) {
-    reset_gun(&mut commands, &window, &mut materials, &mut meshes, &level, &cleanup_gun_entities);
+    reset_gun(&mut commands, &window, &asset_server, &mut texture_atlas_layouts, &level, &cleanup_gun_entities);
     reset_timer(&level, &mut commands, &cleanup_timer_entities);
     reset_targets(&mut commands, &cleanup_target_entities);
     reset_score(score);

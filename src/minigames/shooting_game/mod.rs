@@ -5,7 +5,7 @@ use crate::minigames::{
         bullets_display::{
             cleanup_bullets_text, display_bullets, setup_bullets
         }, gun::{
-            cleanup_gun, gun_follows_mouse, hide_cursor, setup_cursor_icon, setup_gun, show_cursor
+            GunAnimationState, animate_gun_in, animate_gun_out, cleanup_gun, gun_follows_mouse, hide_cursor, setup_cursor_icon, setup_gun, show_cursor
         }, level::setup_minigame_level, menu::{continue_shoot_game, exit_shoot_game, restart_shoot_game, setup_lose_menu, setup_shoot_menu, setup_win_menu}, score::setup_minigame_score, target::{
             advance_expire_and_despawn, cleanup_targets, listen_for_shots_in_target, maintain_intended_target_count, move_targets
         }, timer::{cleanup_timer, setup_timer, update_timer}
@@ -40,6 +40,7 @@ impl Plugin for ShootingMinigamePlugin {
     fn build(&self, app: &mut App) {
         app.insert_state(LossState::None)
             .insert_state(ShootingGameState::Playing)
+            .insert_state(GunAnimationState::None)
             .add_systems(
             OnEnter(MinigameState::Shoot),
                 (
@@ -119,6 +120,11 @@ impl Plugin for ShootingMinigamePlugin {
                     display_bullets.run_if(in_state(MinigameState::Shoot)),
                     update_timer.run_if(in_state(MinigameState::Shoot))
                         .run_if(in_state(MenuAction::None)),
+                    animate_gun_out.run_if(in_state(MinigameState::Shoot))
+                        .run_if(in_state(GunAnimationState::External)),
+                    animate_gun_in.run_if(in_state(MinigameState::Shoot))
+                        .run_if(in_state(GunAnimationState::Internal)),
+                    
                 ).chain()
             );
     
