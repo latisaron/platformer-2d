@@ -33,6 +33,9 @@ const SWITCH_DIRECTION_PERCENTAGE: u32 = 99;
 const POSSIBLE_FRIENDS: [&str; 3] = ["shooting_game/green_atlas.png", "shooting_game/green_atlas.png", "shooting_game/green_atlas.png"];
 const POSSIBLE_ENEMIES: [&str; 3] = ["shooting_game/red_atlas.png", "shooting_game/red_atlas.png", "shooting_game/red_atlas.png"];
 
+// const POSSIBLE_FRIENDS: [&str; 3] = ["shooting_game/tests/green1_atlas.png", "shooting_game/tests/green2_atlas.png", "shooting_game/tests/green3_atlas.png"];
+// const POSSIBLE_ENEMIES: [&str; 3] = ["shooting_game/tests/red1_atlas.png", "shooting_game/tests/red2_atlas.png", "shooting_game/tests/red3_atlas.png"];
+
 #[derive(Eq, PartialEq, Debug)]
 pub enum TargetDirection {
     Right,
@@ -124,11 +127,11 @@ impl Target {
     }
 
     pub fn random_friend() -> String {
-        String::from(POSSIBLE_FRIENDS[Self::random_anything(0, 2) as usize])
+        String::from(POSSIBLE_FRIENDS[Self::random_anything(0, 3) as usize])
     }
 
     pub fn random_enemy() -> String {
-        String::from(POSSIBLE_ENEMIES[Self::random_anything(0, 2) as usize])
+        String::from(POSSIBLE_ENEMIES[Self::random_anything(0, 3) as usize])
     }
 }
 
@@ -333,9 +336,10 @@ pub fn animate_target(
             TargetAnimationStatus::External => {
                 config.frame_timer.tick(time.delta());
                 if config.frame_timer.just_finished() && let Some(atlas) = &mut sprite.texture_atlas {
-                    atlas.index += 1;
                     if atlas.index == config.last_sprite_index {
                         target.is_animating = TargetAnimationStatus::None;
+                    } else {
+                        atlas.index += 1;
                     }
                     config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
                 }
@@ -343,9 +347,10 @@ pub fn animate_target(
             TargetAnimationStatus::Internal => {
                 config.frame_timer.tick(time.delta());
                 if config.frame_timer.just_finished() && let Some(atlas) = &mut sprite.texture_atlas {
-                    atlas.index -= 1;
                     if atlas.index == config.first_sprite_index {
                         target.is_animating = TargetAnimationStatus::None;
+                    } else {
+                        atlas.index -= 1;
                     }
                     config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
                 }
