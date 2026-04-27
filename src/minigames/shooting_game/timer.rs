@@ -9,6 +9,9 @@ pub struct Timer {
 #[derive(Component)]
 pub struct TimerText;
 
+#[derive(Component)]
+pub struct TimerCleanup;
+
 impl Timer {
     pub fn done(&self) -> bool {
         self.remaining <= 0.
@@ -29,6 +32,7 @@ pub fn setup_timer(
     let remaining = level.target_time.unwrap();
     commands.spawn((
         Timer { remaining },
+        TimerCleanup,
     ));
 
     commands.spawn((
@@ -37,6 +41,7 @@ pub fn setup_timer(
             top: px(5),
             ..default()
         },
+        TimerCleanup,
     )).with_children(|parent| {
         parent.spawn((
             Text::default(),
@@ -60,4 +65,13 @@ pub fn update_timer(
     timer.subtract(passed_time);
     let mut span = timer_text_query.single_mut().unwrap();
     span.0 = format!("Remaining Time: {:.2}", timer.remaining);
+}
+
+pub fn cleanup_timer(
+    mut commands: Commands,
+    cleanup_entities: Query<(Entity, &TimerCleanup)>,
+) {
+    for entities in cleanup_entities {
+        commands.entity(entities.0).despawn();
+    }
 }

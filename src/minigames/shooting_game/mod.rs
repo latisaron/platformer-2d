@@ -1,15 +1,14 @@
 use bevy::{prelude::*};
 
 use crate::minigames::{
-    MinigameState,
-    shooting_game::{
+    MinigameState, shared::{level::cleanup_level, lose::lose_level, menu::{menu_action::MenuAction, state_management::{GameState, cleanup_menu}}, score::cleanup_score, win::win_level}, shooting_game::{
         bullets_display::{
-            display_bullets, setup_bullets
+            cleanup_bullets_text, display_bullets, setup_bullets
         }, gun::{
-            gun_follows_mouse, hide_cursor, setup_cursor_icon, setup_gun, show_cursor
-        }, level::setup_minigame_level, score::setup_minigame_score, target::{
-            advance_expire_and_despawn, listen_for_shots_in_target, maintain_intended_target_count, move_targets
-        }, timer::{setup_timer, update_timer}
+            cleanup_gun, gun_follows_mouse, hide_cursor, setup_cursor_icon, setup_gun, show_cursor
+        }, level::setup_minigame_level, menu::{continue_shoot_game, exit_shoot_game, restart_shoot_game, setup_lose_menu, setup_shoot_menu, setup_win_menu}, score::setup_minigame_score, target::{
+            advance_expire_and_despawn, cleanup_targets, listen_for_shots_in_target, maintain_intended_target_count, move_targets
+        }, timer::{cleanup_timer, setup_timer, update_timer}
     }
 };
 
@@ -38,12 +37,59 @@ impl Plugin for ShootingMinigamePlugin {
                 ).chain()
             )
             .add_systems(
+                // delete things from the minigame after exiting
+                OnExit(MinigameState::Shoot),
+                (
+                    cleanup_bullets_text,
+                    cleanup_gun,
+                    cleanup_targets,
+                    cleanup_menu,
+                    cleanup_timer,
+                    cleanup_score,
+                    cleanup_level,
+                ),
+            )
+            .add_systems(
                 OnEnter(MinigameState::Shoot),
                 show_cursor,
             )
             .add_systems(
                 OnExit(MinigameState::Shoot),
                 hide_cursor,
+            )
+            .add_systems(
+                OnEnter(MenuAction::PreLose),
+                lose_level,
+            )
+            .add_systems(
+                OnEnter(MenuAction::PreWin),
+                win_level,
+            )
+            .add_systems(
+                OnEnter(GameState::Menu),
+                (
+                    setup_shoot_menu.run_if(in_state(MinigameState::Shoot)),
+                    setup_lose_menu.run_if(in_state(MenuAction::PreLose))
+                        .run_if(in_state(MinigameState::Shoot)),
+                    setup_win_menu.run_if(in_state(MenuAction::PreWin))
+                        .run_if(in_state(MinigameState::Shoot)),
+                )
+            )
+            .add_systems(
+                OnExit(GameState::Menu),
+                cleanup_menu,
+            )
+            .add_systems(
+                // minigame menu controls
+                Update,
+                (
+                    continue_shoot_game.run_if(in_state(MenuAction::PreContinue))
+                        .run_if(in_state(MinigameState::Shoot)),
+                    restart_shoot_game.run_if(in_state(MenuAction::PreRestart))
+                        .run_if(in_state(MinigameState::Shoot)),
+                    exit_shoot_game.run_if(in_state(MenuAction::PreExit))
+                        .run_if(in_state(MinigameState::Shoot)),
+                )
             )
             .add_systems(
                 Update,

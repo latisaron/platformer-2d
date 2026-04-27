@@ -14,6 +14,9 @@ pub struct Gun {
     pub bullets: usize,
 }
 
+#[derive(Component)]
+pub struct GunCleanup;
+
 pub fn setup_cursor_icon(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -58,6 +61,7 @@ pub fn setup_gun(
             MeshMaterial2d(materials.add(Color::srgb(0.5, 0.5, 0.35))),
             Transform::from_xyz(0., -height/2., GUN_Z_INDEX),
             Gun { bullets: level.bullets.unwrap() },
+            GunCleanup,
         ));
     }
 }
@@ -98,5 +102,14 @@ pub fn decrease_bullets(gun_mut_ref: &mut Single<&mut Gun>) -> Option<usize> {
         Some(gun_mut_ref.bullets)
     } else {
         None
+    }
+}
+
+pub fn cleanup_gun(
+    mut commands: Commands,
+    cleanup_entities: Query<(Entity, &GunCleanup)>,
+) {
+    for entities in cleanup_entities {
+        commands.entity(entities.0).despawn();
     }
 }

@@ -7,6 +7,9 @@ use crate::minigames::{shared::level::Level, shooting_game::gun::Gun};
 #[derive(Component)]
 pub struct BulletsText;
 
+#[derive(Component)]
+pub struct BulletsTextCleanup;
+
 pub fn setup_bullets(
     mut commands: Commands,
     level: Single<&Level>,
@@ -18,6 +21,7 @@ pub fn setup_bullets(
             left: px(5),
             ..default()
         },
+        BulletsTextCleanup
     )).with_children(|parent| {
         parent.spawn((
             Text::default(),
@@ -39,4 +43,13 @@ pub fn display_bullets(
 ) {
     let mut span = query.single_mut().unwrap();
     span.0 = format!("Bullets: {} / {}", gun.bullets, level.bullets.unwrap());
+}
+
+pub fn cleanup_bullets_text(
+    mut commands: Commands,
+    cleanup_entities: Query<(Entity, &BulletsTextCleanup)>,
+) {
+    for entities in cleanup_entities {
+        commands.entity(entities.0).despawn();
+    }
 }

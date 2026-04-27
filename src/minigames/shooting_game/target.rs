@@ -111,6 +111,9 @@ impl Target {
     }
 }
 
+#[derive(Component)]
+pub struct TargetCleanup;
+
 pub fn spawn_individual_target(
     window: &Query<&Window, With<PrimaryWindow>>,
     commands: &mut Commands,
@@ -149,6 +152,7 @@ pub fn spawn_individual_target(
                 remaining_lifetime: Target::random_lifetime(),
                 friendly: friendly,
             },
+            TargetCleanup,
         ));
     }
 }
@@ -254,3 +258,11 @@ pub fn listen_for_shots_in_target(
     }
 }
 
+pub fn cleanup_targets(
+    mut commands: Commands,
+    cleanup_entities: Query<(Entity, &TargetCleanup)>,
+) {
+    for entities in cleanup_entities {
+        commands.entity(entities.0).despawn();
+    }
+}
