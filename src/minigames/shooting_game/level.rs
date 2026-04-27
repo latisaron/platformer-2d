@@ -10,12 +10,12 @@ pub fn target_score_hash(level: usize) -> usize {
     }
 }
 
-pub fn target_time_hash(level: usize) -> usize {
+pub fn target_time_hash(level: usize) -> f32 {
     match level {
-        1 => 20,
-        2 => 30,
-        3 => 45,
-        _ => 133337,
+        1 => 20.,
+        2 => 30.,
+        3 => 45.,
+        _ => 133337.,
     }
 }
 

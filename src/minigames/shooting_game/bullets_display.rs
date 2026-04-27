@@ -38,5 +38,5 @@ pub fn display_bullets(
     mut query: Query<&mut TextSpan, With<BulletsText>>,
 ) {
     let mut span = query.single_mut().unwrap();
-    span.0 = format!("Score: {} / {}", gun.bullets, level.bullets.unwrap());
+    span.0 = format!("Bullets: {} / {}", gun.bullets, level.bullets.unwrap());
 }
