@@ -1,4 +1,4 @@
-use bevy::{prelude::*};
+use bevy::{prelude::*, window::PrimaryWindow};
 use crate::minigames::{
     MinigameState,
     shared::{level::Level, menu::{
@@ -8,7 +8,7 @@ use crate::minigames::{
             GameState,
             setup_menu,
         },
-    }, score::{Score, reset_score}}, shooting_game::level::{bullet_hash, target_score_hash, target_time_hash}
+    }, score::{Score, reset_score}}, shooting_game::{LossState, gun::{GunCleanup, reset_gun}, level::{bullet_hash, target_score_hash, target_time_hash}, target::{TargetCleanup, reset_targets}, timer::{TimerCleanup, reset_timer}}
 };
 
 pub fn setup_shoot_menu(
@@ -39,8 +39,15 @@ pub fn setup_lose_menu(
     materials: ResMut<Assets<ColorMaterial>>,
     meshes: ResMut<Assets<Mesh>>,
     mut menu_action_state: ResMut<NextState<MenuAction>>,
+    loss_state: Res<State<LossState>>,
 ) {
     menu_action_state.set(MenuAction::None);
+    let text =
+        if *loss_state.get() == LossState::Timer {
+            String::from("You ran out of time. Booohooo.")
+        } else {
+            String::from("You got too trigger-happy. No more bullets for you.")
+        };
     setup_menu(
         commands,
         window,
@@ -50,7 +57,7 @@ pub fn setup_lose_menu(
             MenuItemType::Restart(String::from("Restart")),
             MenuItemType::Exit(String::from("Exit")),
         ],
-        String::from("You Lost!"),
+        text,
         2);
 }
 
@@ -92,17 +99,25 @@ pub fn continue_shoot_game(
 pub fn restart_shoot_game(
     mut menu_action_state: ResMut<NextState<MenuAction>>,
     mut game_state: ResMut<NextState<GameState>>,
+    // shared restart actions
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut commands: Commands,
-    mut asset_server: ResMut<AssetServer>,
-    window: Single<& Window>,
-    // chopping block
     // score
     score: Single<&mut Score>,
-    // knife
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    //gun
+    window: Query<&Window, With<PrimaryWindow>>,
+    cleanup_gun_entities: Query<(Entity, &GunCleanup)>,
+    // target
+    cleanup_target_entities: Query<(Entity, &TargetCleanup)>,
+    // timer
+    level: Single<&Level>,
+    cleanup_timer_entities: Query<(Entity, &TimerCleanup)>,
+
 ) {
+    reset_gun(&mut commands, &window, &mut materials, &mut meshes, &level, &cleanup_gun_entities);
+    reset_timer(&level, &mut commands, &cleanup_timer_entities);
+    reset_targets(&mut commands, &cleanup_target_entities);
     reset_score(score);
     menu_action_state.set(MenuAction::None);
     game_state.set(GameState::Play);
@@ -116,4 +131,5 @@ pub fn exit_shoot_game(
     menu_action_state.set(MenuAction::None);
     minigame_state.set(MinigameState::Main);
     game_state.set(GameState::Play);
+    
 }

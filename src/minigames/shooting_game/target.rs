@@ -2,15 +2,15 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use rand::Rng;
 
 use crate::minigames::{
-    shared::score::{
+    shared::{menu::menu_action::MenuAction, score::{
         Score,
         decrease_score,
         increase_score,
-    },
-    shooting_game::gun::{
+    }},
+    shooting_game::{LossState, gun::{
         Gun,
         decrease_bullets,
-    },
+    }},
 };
 
 const TARGET_WIDTH_INTERVAL: (f32, f32) = (100., 200.);
@@ -236,6 +236,8 @@ pub fn listen_for_shots_in_target(
     mut score: Single<&mut Score>,
     targets_query: Query<(&Target, Entity)>,
     mut gun: Single<&mut Gun>,
+    mut menu_action_state: ResMut<NextState<MenuAction>>,
+    mut loss_state: ResMut<NextState<LossState>>,
 ) {
     if keys.just_pressed(MouseButton::Left) {
         if let Some(position) = window.cursor_position() {
@@ -252,9 +254,24 @@ pub fn listen_for_shots_in_target(
                 }
             }
         }
+        // if score.0 == 0 {
+        //     print!("score is {}", score.0);
+        //     menu_action_state.set(MenuAction::PreWin);
+        // }
         if decrease_bullets(&mut gun).is_none() {
-            // game over - not impl 
+            menu_action_state.set(MenuAction::PreLose);
+            loss_state.set(LossState::Bullets);
         }
+    }
+}
+
+pub fn reset_targets(
+    // clean-up
+    commands: &mut Commands,
+    cleanup_entities: &Query<(Entity, &TargetCleanup)>,
+) {
+    for entities in cleanup_entities {
+        commands.entity(entities.0).despawn();
     }
 }
 

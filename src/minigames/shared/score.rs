@@ -58,6 +58,7 @@ pub fn decrease_score(
 pub fn reset_score(
     mut score: Single<&mut Score>
 ) {
+    println!("are we resetting score?");
     score.0 = 0;
 }
 

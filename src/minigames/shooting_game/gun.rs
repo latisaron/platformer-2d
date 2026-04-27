@@ -44,12 +44,12 @@ pub fn show_cursor(mut cursor_options: Single<&mut CursorOptions>) {
     cursor_options.visible = true;
 }
 
-pub fn setup_gun(
-    window: Query<&Window, With<PrimaryWindow>>,
-    mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    level: Single<&Level>,
+pub fn create_gun(
+    window: &Query<&Window, With<PrimaryWindow>>,
+    commands: &mut Commands,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    level: &Single<&Level>,
 ) {
     if let Ok(window) = window.single() {
         let height = window.resolution.height();
@@ -64,6 +64,16 @@ pub fn setup_gun(
             GunCleanup,
         ));
     }
+}
+
+pub fn setup_gun(
+    window: Query<&Window, With<PrimaryWindow>>,
+    mut commands: Commands,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    level: Single<&Level>,
+) {
+    create_gun(&window, &mut commands, &mut materials, &mut meshes, &level);
 }
 
 pub fn gun_follows_mouse(
@@ -103,6 +113,23 @@ pub fn decrease_bullets(gun_mut_ref: &mut Single<&mut Gun>) -> Option<usize> {
     } else {
         None
     }
+}
+
+pub fn reset_gun(
+    // shared
+    commands: &mut Commands,
+    // creation
+    window: &Query<&Window, With<PrimaryWindow>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    level: &Single<&Level>,
+    // cleanup
+    cleanup_entities: &Query<(Entity, &GunCleanup)>,
+) {
+    for entities in cleanup_entities {
+        commands.entity(entities.0).despawn();
+    }
+    create_gun(window, commands, materials, meshes, &level);
 }
 
 pub fn cleanup_gun(

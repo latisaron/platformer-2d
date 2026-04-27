@@ -21,11 +21,26 @@ pub mod target;
 pub mod bullets_display;
 pub mod timer;
 
+#[derive(States, Debug, Hash, Eq, PartialEq, Clone)]
+pub enum LossState {
+    None,
+    Bullets,
+    Timer,
+}
+
+#[derive(States, Debug, Hash, Eq, PartialEq, Clone)]
+pub enum ShootingGameState {
+    Playing,
+    Animating,
+}
+
 pub struct ShootingMinigamePlugin;
 
 impl Plugin for ShootingMinigamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
+        app.insert_state(LossState::None)
+            .insert_state(ShootingGameState::Playing)
+            .add_systems(
             OnEnter(MinigameState::Shoot),
                 (
                     setup_minigame_level,
@@ -68,7 +83,9 @@ impl Plugin for ShootingMinigamePlugin {
             .add_systems(
                 OnEnter(GameState::Menu),
                 (
-                    setup_shoot_menu.run_if(in_state(MinigameState::Shoot)),
+                    setup_shoot_menu.run_if(in_state(ShootingGameState::Playing))
+                        .run_if(in_state(MenuAction::None))
+                        .run_if(in_state(MinigameState::Shoot)),
                     setup_lose_menu.run_if(in_state(MenuAction::PreLose))
                         .run_if(in_state(MinigameState::Shoot)),
                     setup_win_menu.run_if(in_state(MenuAction::PreWin))
@@ -100,7 +117,8 @@ impl Plugin for ShootingMinigamePlugin {
                     move_targets.run_if(in_state(MinigameState::Shoot)),
                     gun_follows_mouse.run_if(in_state(MinigameState::Shoot)),
                     display_bullets.run_if(in_state(MinigameState::Shoot)),
-                    update_timer.run_if(in_state(MinigameState::Shoot)),
+                    update_timer.run_if(in_state(MinigameState::Shoot))
+                        .run_if(in_state(MenuAction::None)),
                 ).chain()
             );
     
