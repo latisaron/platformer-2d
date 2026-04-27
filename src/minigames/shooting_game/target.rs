@@ -1,5 +1,7 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use rand::Rng;
+use std::time::Duration;
+
 
 use crate::minigames::{
     shared::{level::Level, menu::menu_action::MenuAction, score::{
@@ -28,13 +30,20 @@ const MAX_TARGET_COUNT: usize = 10;
 
 const SWITCH_DIRECTION_PERCENTAGE: u32 = 99;
 
-const POSSIBLE_FRIENDS: [&str; 3] = ["shooting_game/green.png", "shooting_game/green.png", "shooting_game/green.png"];
-const POSSIBLE_ENEMIES: [&str; 3] = ["shooting_game/red.png", "shooting_game/red.png", "shooting_game/red.png"];
+const POSSIBLE_FRIENDS: [&str; 3] = ["shooting_game/green_atlas.png", "shooting_game/green_atlas.png", "shooting_game/green_atlas.png"];
+const POSSIBLE_ENEMIES: [&str; 3] = ["shooting_game/red_atlas.png", "shooting_game/red_atlas.png", "shooting_game/red_atlas.png"];
 
 #[derive(Eq, PartialEq, Debug)]
 pub enum TargetDirection {
     Right,
     Left,
+}
+
+#[derive(Eq, PartialEq)]
+pub enum TargetAnimationStatus {
+    None,
+    External,
+    Internal,
 }
 
 #[derive(Component)]
@@ -47,6 +56,8 @@ pub struct Target {
     movement_speed: f32,
     remaining_lifetime: f32,
     friendly: bool,
+    is_animating: TargetAnimationStatus,
+    should_be_deleted: bool,
 }
 
 impl Target {
@@ -124,10 +135,34 @@ impl Target {
 #[derive(Component)]
 pub struct TargetCleanup;
 
+#[derive(Component)]
+pub struct AnimationConfig {
+    first_sprite_index: usize,
+    last_sprite_index: usize,
+    fps: u8,
+    frame_timer: Timer,
+}
+
+impl AnimationConfig {
+    fn new(first: usize, last: usize, fps: u8) -> Self {
+        Self {
+            first_sprite_index: first,
+            last_sprite_index: last,
+            fps,
+            frame_timer: Self::timer_from_fps(fps),
+        }
+    }
+
+    fn timer_from_fps(fps: u8) -> Timer {
+        Timer::new(Duration::from_secs_f32(1.0 / (fps as f32)), TimerMode::Once)
+    }
+}
+
 pub fn spawn_individual_target(
     window: &Query<&Window, With<PrimaryWindow>>,
     commands: &mut Commands,
-    asset_server: &mut ResMut<AssetServer>,
+    asset_server: &Res<AssetServer>,
+    texture_atlas_layouts: &mut ResMut<Assets<TextureAtlasLayout>>,
 ) {
     if let Ok(window) = window.single() {
         let max_width = window.resolution.width();
@@ -144,9 +179,18 @@ pub fn spawn_individual_target(
                 Target::random_enemy()
             };
 
+        let texture = asset_server.load(&asset_string);
+        let layout = TextureAtlasLayout::from_grid(UVec2::new(100, 100), 10, 1, None, None);
+        let texture_atlas_layout = texture_atlas_layouts.add(layout);
+        let target_animation_config = AnimationConfig::new(0, 9, 45);
+
         commands.spawn((
             Sprite {
-                image: asset_server.load(&asset_string),
+                image: texture.clone(),
+                texture_atlas: Some(TextureAtlas {
+                    layout: texture_atlas_layout,
+                    index: target_animation_config.first_sprite_index,
+                }),
                 custom_size: Some(Vec2::new(target_width, target_height)),
                 image_mode: SpriteImageMode::Auto,
                 ..default()
@@ -161,8 +205,11 @@ pub fn spawn_individual_target(
                 movement_speed: Target::random_speed(),
                 remaining_lifetime: Target::random_lifetime(),
                 friendly: friendly,
+                is_animating: TargetAnimationStatus::External,
+                should_be_deleted: false,
             },
             TargetCleanup,
+            target_animation_config,
         ));
     }
 }
@@ -170,12 +217,13 @@ pub fn spawn_individual_target(
 pub fn maintain_intended_target_count(
     window: Query<&Window, With<PrimaryWindow>>,
     mut commands: Commands,
-    mut asset_server: ResMut<AssetServer>,
+    asset_server: Res<AssetServer>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     targets_query: Query<&Target>,
 ) {
     for _ in targets_query.iter().len()..MAX_TARGET_COUNT {
         if Target::random_anything(0, 100) >= 98 {
-            spawn_individual_target(&window, &mut commands, &mut asset_server);
+            spawn_individual_target(&window, &mut commands, &asset_server, &mut texture_atlas_layouts);
         }
     }
 }
@@ -241,10 +289,9 @@ pub fn move_targets(
 pub fn listen_for_shots_in_target(
     window: Single<&Window, With<PrimaryWindow>>,
     keys: Res<ButtonInput<MouseButton>>,
-    mut commands: Commands,
     mut score: Single<&mut Score>,
     level: Single<&Level>,
-    targets_query: Query<(&Target, Entity)>,
+    targets_query: Query<&mut Target>,
     mut gun: Single<&mut Gun>,
     mut menu_action_state: ResMut<NextState<MenuAction>>,
     mut loss_state: ResMut<NextState<LossState>>,
@@ -255,14 +302,15 @@ pub fn listen_for_shots_in_target(
         if let Some(position) = window.cursor_position() {
             let x =  position[0] - window.width() / 2.0;
             let y = -(position[1] - window.height() / 2.0);
-            for (target, entity) in targets_query {
-                if target.within_self_bounds(x, y) {
+            for mut target in targets_query {
+                if target.within_self_bounds(x, y) && !target.should_be_deleted {
                     if target.friendly {
                         decrease_score(&mut score);
                     } else {
                         increase_score(&mut score);
                     }
-                    commands.entity(entity).despawn();
+                    target.is_animating = TargetAnimationStatus::Internal;
+                    target.should_be_deleted = true;
                 }
             }
         }
@@ -272,6 +320,48 @@ pub fn listen_for_shots_in_target(
         if decrease_bullets(&mut gun).is_none() {
             menu_action_state.set(MenuAction::PreLose);
             loss_state.set(LossState::Bullets);
+        }
+    }
+}
+
+pub fn animate_target(
+    time: Res<Time>,
+    targets_query: Query<(&mut AnimationConfig, &mut Sprite, &mut Target)>,
+) {
+    for (mut config, mut sprite, mut target) in targets_query {
+        match target.is_animating {
+            TargetAnimationStatus::External => {
+                config.frame_timer.tick(time.delta());
+                if config.frame_timer.just_finished() && let Some(atlas) = &mut sprite.texture_atlas {
+                    atlas.index += 1;
+                    if atlas.index == config.last_sprite_index {
+                        target.is_animating = TargetAnimationStatus::None;
+                    }
+                    config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
+                }
+            },
+            TargetAnimationStatus::Internal => {
+                config.frame_timer.tick(time.delta());
+                if config.frame_timer.just_finished() && let Some(atlas) = &mut sprite.texture_atlas {
+                    atlas.index -= 1;
+                    if atlas.index == config.first_sprite_index {
+                        target.is_animating = TargetAnimationStatus::None;
+                    }
+                    config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
+                }
+            },
+            TargetAnimationStatus::None => ()
+        }
+    }
+}
+
+pub fn remove_soft_deleted_targets(
+    mut commands: Commands,
+    targets_query: Query<(&Target, Entity)>,
+) {
+    for (target, entity) in targets_query {
+        if target.should_be_deleted && target.is_animating == TargetAnimationStatus::None {
+            commands.entity(entity).despawn();
         }
     }
 }
