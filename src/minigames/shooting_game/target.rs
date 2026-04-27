@@ -2,7 +2,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use rand::Rng;
 
 use crate::minigames::{
-    shared::{menu::menu_action::MenuAction, score::{
+    shared::{level::Level, menu::menu_action::MenuAction, score::{
         Score,
         decrease_score,
         increase_score,
@@ -234,6 +234,7 @@ pub fn listen_for_shots_in_target(
     keys: Res<ButtonInput<MouseButton>>,
     mut commands: Commands,
     mut score: Single<&mut Score>,
+    level: Single<&Level>,
     targets_query: Query<(&Target, Entity)>,
     mut gun: Single<&mut Gun>,
     mut menu_action_state: ResMut<NextState<MenuAction>>,
@@ -254,10 +255,9 @@ pub fn listen_for_shots_in_target(
                 }
             }
         }
-        // if score.0 == 0 {
-        //     print!("score is {}", score.0);
-        //     menu_action_state.set(MenuAction::PreWin);
-        // }
+        if score.0 >= level.target_score {
+            menu_action_state.set(MenuAction::PreWin);
+        }
         if decrease_bullets(&mut gun).is_none() {
             menu_action_state.set(MenuAction::PreLose);
             loss_state.set(LossState::Bullets);
