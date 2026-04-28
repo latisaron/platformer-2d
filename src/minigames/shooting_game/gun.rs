@@ -89,7 +89,7 @@ pub fn create_gun(
         let texture = asset_server.load("shooting_game/gun_atlas.png");
         let layout = TextureAtlasLayout::from_grid(UVec2::new(100, 200), 10, 1, None, None);
         let texture_atlas_layout = texture_atlas_layouts.add(layout);
-        let gun_animation_config = AnimationConfig::new(0, 9, 180);
+        let gun_animation_config = AnimationConfig::new(0, 9, 240);
 
         commands.spawn((
             Sprite {

@@ -3,9 +3,9 @@ use crate::minigames::shared::level::{CleanupLevel, Level};
 
 pub fn target_score_hash(level: usize) -> usize {
     match level {
-        1 => 10,
-        2 => 20,
-        3 => 30,
+        1 => 15,
+        2 => 25,
+        3 => 40,
         _ => 133337,
     }
 }
@@ -14,7 +14,7 @@ pub fn target_time_hash(level: usize) -> f32 {
     match level {
         1 => 20.,
         2 => 30.,
-        3 => 45.,
+        3 => 40.,
         _ => 133337.,
     }
 }
