@@ -1,5 +1,8 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
+// const ENVIRONMENT_ASSET: &'static str = "shooting_game/tests/environment.png";
+const ENVIRONMENT_ASSET: &'static str = "shooting_game/environment.png";
+
 #[derive(Component)]
 pub struct EnvironmentCleanup;
 
@@ -10,7 +13,7 @@ pub fn create_environment(
 ) {
     commands.spawn((
         Sprite {
-            image: asset_server.load("shooting_game/Environment.png"),
+            image: asset_server.load(ENVIRONMENT_ASSET),
             custom_size: Some(Vec2::new(window.width(), window.height())),
             image_mode: SpriteImageMode::Auto,
             ..default()
