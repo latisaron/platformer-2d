@@ -13,10 +13,6 @@ pub struct TimerText;
 pub struct TimerCleanup;
 
 impl Timer {
-    pub fn done(&self) -> bool {
-        self.remaining <= 0.
-    }
-
     pub fn subtract(&mut self, b: f32) {
         self.remaining -= b;
         if self.remaining < 0. {

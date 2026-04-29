@@ -1,6 +1,6 @@
 use bevy::{
     prelude::*,
-    window::{PrimaryWindow, CursorIcon, CustomCursor, CustomCursorImage, CursorOptions, WindowFocused},
+    window::{PrimaryWindow, CursorIcon, CustomCursor, CustomCursorImage, CursorOptions},
 };
 use std::time::Duration;
 
