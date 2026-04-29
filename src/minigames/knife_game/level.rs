@@ -19,6 +19,7 @@ pub fn setup_minigame_level(
             target_score: knife_hash(1),
             target_time: None,
             bullets: None,
+            secret_password: None,
         },
         CleanupLevel
     ));

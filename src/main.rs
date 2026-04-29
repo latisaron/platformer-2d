@@ -17,6 +17,7 @@ use minigames::knife_game::{KnifeMinigamePlugin};
 use minigames::shared::menu::state_management::{GameState};
 
 use crate::minigames::main::MainMinigamePlugin;
+use crate::minigames::quiz::QuizMinigamePlugin;
 use crate::minigames::shooting_game::ShootingMinigamePlugin;
 
 fn main() {
@@ -36,6 +37,7 @@ fn main() {
         .add_plugins(MainMinigamePlugin)
         .add_plugins(KnifeMinigamePlugin)
         .add_plugins(ShootingMinigamePlugin)
+        .add_plugins(QuizMinigamePlugin)
         .run();
 
         // .add_systems(Startup, setup_walls)

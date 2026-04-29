@@ -9,6 +9,7 @@ pub struct Level {
     pub target_score: usize,
     pub target_time: Option<f32>,
     pub bullets: Option<usize>,
+    pub secret_password: Option<String>,
 }
 
 pub fn cleanup_level(

@@ -10,4 +10,7 @@ pub fn choose_minigame(
     } else if keys.just_pressed(KeyCode::KeyL) {
         current_minigame.set(MinigameState::Shoot);
     }
+     else if keys.just_pressed(KeyCode::KeyJ) {
+        current_minigame.set(MinigameState::Quiz);
+    }
 }

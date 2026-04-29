@@ -37,6 +37,7 @@ pub fn setup_minigame_level(
             target_score: target_score_hash(1),
             target_time: Some(target_time_hash(1)),
             bullets: Some(bullet_hash(1)),
+            secret_password: None,
         },
         CleanupLevel
     ));
