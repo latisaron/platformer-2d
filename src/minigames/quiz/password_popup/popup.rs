@@ -1,6 +1,11 @@
 use bevy::{prelude::*};
 
-use crate::minigames::quiz::{password::Password, password_popup::cleanup::CleanupPasswordPopup};
+use crate::minigames::quiz::{
+    password_popup::{
+        cleanup::CleanupPasswordPopup,
+        password::{Password},
+    },
+};
 
 pub const POPUP_WIDTH: f32 = 800.;
 pub const POPUP_HEIGHT: f32 = 600.;

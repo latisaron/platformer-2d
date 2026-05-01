@@ -1,6 +1,6 @@
 use bevy::{prelude::*};
 
-use crate::minigames::shared::level::Level;
+use crate::minigames::{quiz::password_popup::cleanup::CleanupPasswordPopup, shared::level::Level};
 
 #[derive(Component)]
 pub struct Password {
@@ -14,16 +14,16 @@ impl Password {
     }
 }
 
-#[derive(Component)]
-pub struct CleanupPassword;
-
 pub fn create_password(
     commands: &mut Commands,
     level: &Single<&Level>,
 ) {
     if let Some(actual_string) = level.secret_password.clone() {
         commands.spawn(
-            Password { secret: actual_string, current_password: String::from("") }
+            (
+                Password { secret: actual_string, current_password: String::from("") },
+                CleanupPasswordPopup,
+            )
         );
     }
 }
@@ -39,19 +39,10 @@ pub fn restart_password(
     commands: &mut Commands,
     level: &Single<&Level>,
     // cleanup
-    password_entities: &Query<Entity, With<CleanupPassword>>,
+    password_entities: &Query<Entity, With<CleanupPasswordPopup>>,
 ) {
     for entity in password_entities {
         commands.entity(entity).despawn();
     }
     create_password(commands, level);;
-}
-
-pub fn cleanup_password(
-    mut commands: Commands,
-    password_entities: &Query<Entity, With<CleanupPassword>>,
-) {
-    for entity in password_entities {
-        commands.entity(entity).despawn();
-    }
 }

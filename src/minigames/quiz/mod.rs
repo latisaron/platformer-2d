@@ -4,7 +4,6 @@ use crate::minigames::{
     MinigameState,
     quiz::{
         level::setup_minigame_level,
-        password::setup_password,
         password_popup::{
             alarm::start_alarm, cleanup::cleanup_password_popup_entities, close::{
                 handle_close_click, setup_close_button
@@ -15,7 +14,8 @@ use crate::minigames::{
                 handle_popup_input, setup_password_popup
             }, submit::{
                 handle_submit_click, setup_submit_button
-            }
+            },
+            password::setup_password,
         }, request_review_button::{
             cleanup_request_review_button,
             handle_request_review_button_interaction,
@@ -24,7 +24,6 @@ use crate::minigames::{
     }
 };
 
-pub mod password;
 pub mod request_review_button;
 pub mod password_popup;
 pub mod level;

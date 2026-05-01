@@ -1,6 +1,10 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::minigames::quiz::{QuizGameState, password::Password, password_popup::{cleanup::CleanupPasswordPopup, popup::{POPUP_HEIGHT, POPUP_WIDTH}}};
+use crate::minigames::quiz::{
+    QuizGameState,
+    password_popup::{
+        cleanup::CleanupPasswordPopup, password::Password, popup::{POPUP_HEIGHT, POPUP_WIDTH}},
+    };
 
 const BUTTON_WIDTH: f32 = 320.;
 const BUTTON_HEIGHT: f32 = 80.;

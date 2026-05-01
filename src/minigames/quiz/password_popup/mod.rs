@@ -5,3 +5,4 @@ pub mod popup;
 pub mod submit;
 pub mod mumbo_jumbo;
 pub mod alarm;
+pub mod password;
