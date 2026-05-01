@@ -4,27 +4,18 @@ use crate::minigames::{
     MinigameState,
     quiz::{
         level::setup_minigame_level,
-        password::{
-            setup_password,
-        },
+        password::setup_password,
         password_popup::{
-            cleanup::cleanup_password_popup_entities,
-            close::{
-                setup_close_button,
-                handle_close_click,
-            },
-            mumbo_jumbo::{
+            alarm::start_alarm, cleanup::cleanup_password_popup_entities, close::{
+                handle_close_click, setup_close_button
+            }, mumbo_jumbo::{
                 animate_mumbo_jumbo,
                 setup_mumbo_jumbo
-            },
-            popup::{
-                setup_password_popup,
-                handle_popup_input,
-            },
-            submit::{
-                setup_submit_button,
-                handle_submit_click,
-            },
+            }, popup::{
+                handle_popup_input, setup_password_popup
+            }, submit::{
+                handle_submit_click, setup_submit_button
+            }
         }, request_review_button::{
             cleanup_request_review_button,
             handle_request_review_button_interaction,
@@ -74,6 +65,7 @@ impl Plugin for QuizMinigamePlugin {
             .add_systems(
                 OnEnter(QuizGameState::PasswordPopup),
                 (
+                    start_alarm,
                     setup_password,
                     setup_password_popup,
                     setup_submit_button,
