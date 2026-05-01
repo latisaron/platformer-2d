@@ -1,6 +1,6 @@
-use bevy::{prelude::*};
+use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::minigames::quiz::password_popup::{cleanup::CleanupPasswordPopup, popup::{POPUP_HEIGHT, POPUP_WIDTH, PasswordPopup}};
+use crate::minigames::quiz::{password::Password, password_popup::{cleanup::CleanupPasswordPopup, popup::{POPUP_HEIGHT, POPUP_WIDTH, PasswordPopup}}};
 
 const BUTTON_WIDTH: f32 = 320.;
 const BUTTON_HEIGHT: f32 = 80.;
@@ -32,4 +32,29 @@ pub fn setup_submit_button(
     mut asset_server: ResMut<AssetServer>
 ) {
     create_submit_button(&mut commands, &mut asset_server);
+}
+
+pub fn handle_submit_click(
+    window: Single<&Window, With<PrimaryWindow>>,
+    keys: Res<ButtonInput<MouseButton>>,
+    password: Single<&Password>,
+    submit_button: Single<&Transform, With<SubmitButton>>,
+) {
+    if keys.just_pressed(MouseButton::Left) {
+        if let Some(position) = window.cursor_position() {
+            let x =  position[0] - window.width() / 2.0;
+            let y = -(position[1] - window.height() / 2.0);
+
+            let button_lwr_x = submit_button.translation.x - BUTTON_WIDTH / 2.;
+            let button_upr_x = submit_button.translation.x + BUTTON_WIDTH / 2.;
+            let button_lwr_y = submit_button.translation.y - BUTTON_HEIGHT / 2.;
+            let button_upr_y = submit_button.translation.y + BUTTON_HEIGHT / 2.;
+
+            if x >= button_lwr_x && x <= button_upr_x && y >= button_lwr_y && y <= button_upr_y {
+                if password.correct() {
+                    println!("password {} is correct!!", password.current_password);
+                }
+            }
+        }
+    }
 }

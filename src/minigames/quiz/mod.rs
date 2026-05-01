@@ -3,11 +3,28 @@ use bevy::{prelude::*};
 use crate::minigames::{
     MinigameState,
     quiz::{
-        level::setup_minigame_level, password::setup_password, password_popup::{
+        level::setup_minigame_level,
+        password::{
+            setup_password,
+        },
+        password_popup::{
             cleanup::cleanup_password_popup_entities,
-            close::setup_close_button,
-            popup::setup_password_popup,
-            submit::setup_submit_button
+            close::{
+                setup_close_button,
+                handle_close_click,
+            },
+            mumbo_jumbo::{
+                animate_mumbo_jumbo,
+                setup_mumbo_jumbo
+            },
+            popup::{
+                setup_password_popup,
+                handle_popup_input,
+            },
+            submit::{
+                setup_submit_button,
+                handle_submit_click,
+            },
         }, request_review_button::{
             cleanup_request_review_button,
             handle_request_review_button_interaction,
@@ -42,7 +59,6 @@ impl Plugin for QuizMinigamePlugin {
                 ).chain()
             )
             .add_systems(
-                // delete things from the minigame after exiting
                 OnExit(MinigameState::Quiz),
                 (
                     cleanup_request_review_button,
@@ -50,8 +66,10 @@ impl Plugin for QuizMinigamePlugin {
             )
             .add_systems(
                 Update,
-                handle_request_review_button_interaction.run_if(in_state(MinigameState::Quiz))
-                        .run_if(in_state(QuizGameState::Choosing))
+                    (
+                    handle_request_review_button_interaction.run_if(in_state(MinigameState::Quiz))
+                            .run_if(in_state(QuizGameState::Choosing)),
+                    )
             )
             .add_systems(
                 OnEnter(QuizGameState::PasswordPopup),
@@ -60,6 +78,7 @@ impl Plugin for QuizMinigamePlugin {
                     setup_password_popup,
                     setup_submit_button,
                     setup_close_button,
+                    setup_mumbo_jumbo
                 )
             )
             .add_systems(
@@ -67,6 +86,19 @@ impl Plugin for QuizMinigamePlugin {
                 (
                     cleanup_password_popup_entities,
                 )
+            )
+            .add_systems(
+                Update,
+                    (
+                            animate_mumbo_jumbo.run_if(in_state(MinigameState::Quiz))
+                                .run_if(in_state(QuizGameState::PasswordPopup)),
+                            handle_popup_input.run_if(in_state(MinigameState::Quiz))
+                                .run_if(in_state(QuizGameState::PasswordPopup)),
+                            handle_submit_click.run_if(in_state(MinigameState::Quiz))
+                                .run_if(in_state(QuizGameState::PasswordPopup)),
+                            handle_close_click.run_if(in_state(MinigameState::Quiz))
+                                .run_if(in_state(QuizGameState::PasswordPopup)),
+                    )
             );
             // .add_systems(
             //     OnEnter(MinigameState::Quiz),

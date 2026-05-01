@@ -5,6 +5,13 @@ use crate::minigames::shared::level::Level;
 #[derive(Component)]
 pub struct Password {
     secret: String,
+    pub current_password: String,
+}
+
+impl Password {
+    pub fn correct(&self) -> bool {
+        self.secret == self.current_password
+    }
 }
 
 #[derive(Component)]
@@ -16,7 +23,7 @@ pub fn create_password(
 ) {
     if let Some(actual_string) = level.secret_password.clone() {
         commands.spawn(
-            Password { secret: actual_string }
+            Password { secret: actual_string, current_password: String::from("") }
         );
     }
 }
