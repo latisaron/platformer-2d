@@ -3,8 +3,7 @@ use bevy::{prelude::*};
 use crate::minigames::{
     MinigameState,
     quiz::{
-        level::setup_minigame_level,
-        password_popup::{
+        level::setup_minigame_level, menu::{continue_quiz_game, exit_quiz_game, setup_quiz_menu}, password_popup::{
             alarm::start_alarm, cleanup::cleanup_password_popup_entities, close::{
                 handle_close_click, setup_close_button
             }, error::{despawn_error_if_done, setup_error_flash_popup}, mumbo_jumbo::{
@@ -14,18 +13,19 @@ use crate::minigames::{
                 handle_popup_input, setup_password_popup
             }, submit::{
                 handle_submit_click, setup_submit_button
-            }
+            }, win::{despawn_win_if_done, setup_win_flash_popup}
         }, request_review_button::{
             cleanup_request_review_button,
             handle_request_review_button_interaction,
             setup_review_request_button
         }
-    }
+    }, shared::menu::{menu_action::MenuAction, state_management::{GameState, cleanup_menu}}
 };
 
 pub mod request_review_button;
 pub mod password_popup;
 pub mod level;
+pub mod menu;
 
 #[derive(States, Hash, PartialEq, Eq, Debug, Clone)]
 pub enum QuizGameState {
@@ -98,7 +98,34 @@ impl Plugin for QuizMinigamePlugin {
                 Update,
                 despawn_error_if_done.run_if(in_state(MinigameState::Quiz))
                                 .run_if(in_state(QuizGameState::PasswordPopupError)),
+            )
+            .add_systems(
+                OnEnter(QuizGameState::PasswordPopupWin),
+                setup_win_flash_popup,
+            ).add_systems(
+                Update,
+                despawn_win_if_done.run_if(in_state(MinigameState::Quiz))
+                                .run_if(in_state(QuizGameState::PasswordPopupWin)),
+            ).add_systems(
+                OnEnter(GameState::Menu),
+                    setup_quiz_menu.run_if(in_state(MenuAction::None))
+                        .run_if(in_state(MinigameState::Quiz)),
+            )
+            .add_systems(
+                Update,
+                (
+                    continue_quiz_game.run_if(in_state(MenuAction::PreContinue))
+                        .run_if(in_state(MinigameState::Quiz)),
+                    exit_quiz_game.run_if(in_state(MenuAction::PreExit))
+                        .run_if(in_state(MinigameState::Quiz)),
+                )
+            )
+            .add_systems(
+                OnExit(GameState::Menu),
+                cleanup_menu,
             );
+
+
             // .add_systems(
             //     OnEnter(MinigameState::Quiz),
             //     show_cursor,
