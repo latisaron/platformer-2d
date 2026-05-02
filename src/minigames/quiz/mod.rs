@@ -3,7 +3,11 @@ use bevy::{prelude::*};
 use crate::minigames::{
     MinigameState,
     quiz::{
-        inventory::player_model::setup_player_model, level::setup_minigame_level, menu::{continue_quiz_game, exit_quiz_game, setup_quiz_menu, setup_win_menu}, password_popup::{
+        inventory::{
+            player_model::setup_player_model,
+            basic::setup_inventory_ui,
+        },
+        level::setup_minigame_level, menu::{continue_quiz_game, exit_quiz_game, setup_quiz_menu, setup_win_menu}, password_popup::{
             alarm::start_alarm, cleanup::cleanup_password_popup_entities, close::{
                 handle_close_click, setup_close_button
             }, error::{despawn_error_if_done, setup_error_flash_popup}, mumbo_jumbo::{
@@ -50,6 +54,7 @@ impl Plugin for QuizMinigamePlugin {
                     setup_minigame_score,
                     setup_review_request_button,
                     setup_player_model,
+                    setup_inventory_ui,
                 ).chain()
             )
             .add_systems(
