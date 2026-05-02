@@ -6,3 +6,4 @@ pub mod submit;
 pub mod mumbo_jumbo;
 pub mod alarm;
 pub mod password;
+pub mod win;

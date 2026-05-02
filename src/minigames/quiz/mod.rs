@@ -7,15 +7,14 @@ use crate::minigames::{
         password_popup::{
             alarm::start_alarm, cleanup::cleanup_password_popup_entities, close::{
                 handle_close_click, setup_close_button
-            }, mumbo_jumbo::{
+            }, error::{despawn_error_if_done, setup_error_flash_popup}, mumbo_jumbo::{
                 animate_mumbo_jumbo,
                 setup_mumbo_jumbo
-            }, popup::{
+            }, password::setup_password, popup::{
                 handle_popup_input, setup_password_popup
             }, submit::{
                 handle_submit_click, setup_submit_button
-            },
-            password::setup_password,
+            }
         }, request_review_button::{
             cleanup_request_review_button,
             handle_request_review_button_interaction,
@@ -33,6 +32,7 @@ pub enum QuizGameState {
     None,
     PasswordPopup,
     PasswordPopupError,
+    PasswordPopupWin,
     Choosing,
 }
 
@@ -90,6 +90,14 @@ impl Plugin for QuizMinigamePlugin {
                             handle_close_click.run_if(in_state(MinigameState::Quiz))
                                 .run_if(in_state(QuizGameState::PasswordPopup)),
                     )
+            )
+            .add_systems(
+                OnEnter(QuizGameState::PasswordPopupError),
+                setup_error_flash_popup,
+            ).add_systems(
+                Update,
+                despawn_error_if_done.run_if(in_state(MinigameState::Quiz))
+                                .run_if(in_state(QuizGameState::PasswordPopupError)),
             );
             // .add_systems(
             //     OnEnter(MinigameState::Quiz),

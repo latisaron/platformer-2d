@@ -11,6 +11,7 @@ use crate::minigames::quiz::{
         password::{Password},
     },
 };
+use crate::minigames::quiz::QuizGameState;
 
 const BUTTON_WIDTH: f32 = 320.;
 const BUTTON_HEIGHT: f32 = 80.;
@@ -39,7 +40,7 @@ pub fn create_submit_button(
 
 pub fn setup_submit_button(
     mut commands: Commands,
-    mut asset_server: ResMut<AssetServer>
+    mut asset_server: ResMut<AssetServer>,
 ) {
     create_submit_button(&mut commands, &mut asset_server);
 }
@@ -49,6 +50,7 @@ pub fn handle_submit_click(
     keys: Res<ButtonInput<MouseButton>>,
     password: Single<&Password>,
     submit_button: Single<&Transform, With<SubmitButton>>,
+    mut current_state: ResMut<NextState<QuizGameState>>,
 ) {
     if keys.just_pressed(MouseButton::Left) {
         if let Some(position) = window.cursor_position() {
@@ -63,6 +65,8 @@ pub fn handle_submit_click(
             if x >= button_lwr_x && x <= button_upr_x && y >= button_lwr_y && y <= button_upr_y {
                 if password.correct() {
                     println!("password {} is correct!!", password.current_password);
+                } else {
+                    current_state.set(QuizGameState::PasswordPopupError);
                 }
             }
         }

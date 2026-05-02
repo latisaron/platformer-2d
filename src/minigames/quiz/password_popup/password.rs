@@ -34,15 +34,3 @@ pub fn setup_password(
 ) {
     create_password(&mut commands, &level);
 }
-
-pub fn restart_password(
-    commands: &mut Commands,
-    level: &Single<&Level>,
-    // cleanup
-    password_entities: &Query<Entity, With<CleanupPasswordPopup>>,
-) {
-    for entity in password_entities {
-        commands.entity(entity).despawn();
-    }
-    create_password(commands, level);;
-}

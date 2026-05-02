@@ -1,4 +1,42 @@
 use bevy::{prelude::*};
 
+use crate::minigames::quiz::{QuizGameState, password_popup::popup::{POPUP_HEIGHT, POPUP_WIDTH, POPUP_X, POPUP_Y}};
+
+const DEFAULT_ERROR_TIME: f32 = 5.;
+
 #[derive(Component)]
-pub struct ErrorFlashPopup;
+pub struct ErrorFlashPopup {
+    pub remaining_time: f32,
+}
+
+pub fn setup_error_flash_popup(
+    mut commands: Commands,
+    asset_server: ResMut<AssetServer>,
+) {
+        commands.spawn((
+        Sprite {
+            image: asset_server.load("quiz_game/error.png"),
+            custom_size: Some(Vec2::new(POPUP_WIDTH, POPUP_HEIGHT)),
+            image_mode: SpriteImageMode::Auto,
+            ..default()
+        },
+        Transform::from_xyz(POPUP_X, POPUP_Y, 8.),
+        ErrorFlashPopup { remaining_time: DEFAULT_ERROR_TIME },
+    ));
+}
+
+pub fn despawn_error_if_done(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut error_popup: Single<(&mut ErrorFlashPopup, Entity)>,
+    mut next_state: ResMut<NextState<QuizGameState>>
+) {
+    let passed_time = time.delta_secs();
+
+    if error_popup.0.remaining_time - passed_time <= 0. {
+        commands.entity(error_popup.1).despawn();
+        next_state.set(QuizGameState::Choosing);
+    } else {
+        error_popup.0.remaining_time -= passed_time;
+    }
+}
