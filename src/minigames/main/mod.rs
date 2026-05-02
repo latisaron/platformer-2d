@@ -32,6 +32,7 @@ impl Plugin for MainMinigamePlugin {
             display_score.run_if(
                 in_state(MinigameState::Knife)
                             .or(in_state(MinigameState::Shoot))
+                            .or(in_state(MinigameState::Quiz))
                     )
             )
             .add_systems(

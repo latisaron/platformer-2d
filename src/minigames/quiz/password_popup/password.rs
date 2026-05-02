@@ -1,6 +1,6 @@
 use bevy::{prelude::*};
 
-use crate::minigames::{quiz::password_popup::cleanup::CleanupPasswordPopup, shared::level::Level};
+use crate::minigames::{quiz::{level::target_score_hash, password_popup::cleanup::CleanupPasswordPopup}, shared::level::Level};
 
 #[derive(Component)]
 pub struct Password {
@@ -11,6 +11,10 @@ pub struct Password {
 impl Password {
     pub fn correct(&self) -> bool {
         self.secret == self.current_password
+    }
+
+    pub fn change_secret(&mut self, level: usize) {
+        self.secret = target_score_hash(level);
     }
 }
 

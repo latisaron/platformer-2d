@@ -16,7 +16,7 @@ pub fn setup_minigame_level(
     commands.spawn((
         Level {
             current_value: 1,
-            target_score: 1,
+            target_score: 3,
             target_time: None,
             bullets: None,
             secret_password: Some(target_score_hash(1)),

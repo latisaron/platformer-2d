@@ -31,6 +31,32 @@ pub fn setup_quiz_menu(
         3);
 }
 
+pub fn setup_win_menu(
+    commands: Commands,
+    materials: ResMut<Assets<ColorMaterial>>,
+    meshes: ResMut<Assets<Mesh>>,
+    mut menu_action_state: ResMut<NextState<MenuAction>>,
+    window: Single<& Window>,
+    mut level: Single<&mut Level>,
+) {
+    menu_action_state.set(MenuAction::None);
+    level.target_score = target_score_hash(level.current_value + 1);
+    level.target_time = Some(target_time_hash(level.current_value + 1));
+    level.bullets = Some(bullet_hash(level.current_value + 1));
+
+    level.current_value += 1;
+    setup_menu(
+        commands,
+        window,
+        materials,
+        meshes,
+        vec![
+            MenuItemType::Exit(String::from("Exit")),
+        ],
+        String::from("You are Merryl Streep in The Devil Wears Prada.\nSlay."),
+        2);
+}
+
 pub fn continue_quiz_game(
     mut menu_action_state: ResMut<NextState<MenuAction>>,
     mut game_state: ResMut<NextState<GameState>>,

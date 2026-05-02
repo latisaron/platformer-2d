@@ -1,16 +1,12 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::minigames::quiz::{
-    password_popup::{
-        cleanup::CleanupPasswordPopup,
-        popup::{
+use crate::minigames::{quiz::{level::target_score_hash, password_popup::{
+        cleanup::CleanupPasswordPopup, password::Password, popup::{
             POPUP_HEIGHT,
             POPUP_WIDTH,
             PasswordPopup,
-        },
-        password::{Password},
-    },
-};
+        }
+    }}, shared::{level::Level, menu::menu_action::MenuAction, score::{Score, increase_score}}};
 use crate::minigames::quiz::QuizGameState;
 
 const BUTTON_WIDTH: f32 = 320.;
@@ -48,9 +44,12 @@ pub fn setup_submit_button(
 pub fn handle_submit_click(
     window: Single<&Window, With<PrimaryWindow>>,
     keys: Res<ButtonInput<MouseButton>>,
-    password: Single<&Password>,
     submit_button: Single<&Transform, With<SubmitButton>>,
+    mut password: Single<&mut Password>,
     mut current_state: ResMut<NextState<QuizGameState>>,
+    mut menu_state: ResMut<NextState<MenuAction>>,
+    mut level: Single<&mut Level>,
+    mut score: Single<&mut Score>,
 ) {
     if keys.just_pressed(MouseButton::Left) {
         if let Some(position) = window.cursor_position() {
@@ -64,7 +63,17 @@ pub fn handle_submit_click(
 
             if x >= button_lwr_x && x <= button_upr_x && y >= button_lwr_y && y <= button_upr_y {
                 if password.correct() {
-                    current_state.set(QuizGameState::PasswordPopupWin);
+                    if score.0 < 3 {
+                        current_state.set(QuizGameState::PasswordPopupWin);
+                        level.current_value += 1;
+                        let new_secret = target_score_hash(level.current_value);
+                        level.secret_password = Some(new_secret.clone());
+                        password.change_secret(level.current_value);
+                        password.current_password = String::from("");
+                        increase_score(&mut score);
+                    } else {
+                        menu_state.set(MenuAction::PreWin);
+                    }
                 } else {
                     current_state.set(QuizGameState::PasswordPopupError);
                 }
