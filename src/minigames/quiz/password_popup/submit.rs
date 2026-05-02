@@ -63,17 +63,16 @@ pub fn handle_submit_click(
 
             if x >= button_lwr_x && x <= button_upr_x && y >= button_lwr_y && y <= button_upr_y {
                 if password.correct() {
-                    if score.0 < 3 {
-                        current_state.set(QuizGameState::PasswordPopupWin);
-                        level.current_value += 1;
-                        let new_secret = target_score_hash(level.current_value);
-                        level.secret_password = Some(new_secret.clone());
-                        password.change_secret(level.current_value);
-                        password.current_password = String::from("");
-                        increase_score(&mut score);
-                    } else {
+                    current_state.set(QuizGameState::PasswordPopupWin);
+                    level.current_value += 1;
+                    let new_secret = target_score_hash(level.current_value);
+                    level.secret_password = Some(new_secret.clone());
+                    password.change_secret(level.current_value);
+                    password.current_password = String::from("");
+                    increase_score(&mut score);
+                    if score.0 == 3 {
                         menu_state.set(MenuAction::PreWin);
-                    }
+                    } 
                 } else {
                     current_state.set(QuizGameState::PasswordPopupError);
                 }
