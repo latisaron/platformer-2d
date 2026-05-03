@@ -4,8 +4,7 @@ use crate::minigames::{
     MinigameState,
     quiz::{
         inventory::{
-            player_model::setup_player_model,
-            basic::setup_inventory_ui,
+            basic::{handle_inventory_clicks, setup_inventory_ui}, category_popup::handle_item_selection, player_model::setup_player_model
         },
         level::setup_minigame_level, menu::{continue_quiz_game, exit_quiz_game, setup_quiz_menu, setup_win_menu}, password_popup::{
             alarm::start_alarm, cleanup::cleanup_password_popup_entities, close::{
@@ -40,6 +39,7 @@ pub enum QuizGameState {
     PasswordPopupError,
     PasswordPopupWin,
     Choosing,
+    Browsing,
 }
 
 pub struct QuizMinigamePlugin;
@@ -70,6 +70,10 @@ impl Plugin for QuizMinigamePlugin {
                     (
                     handle_request_review_button_interaction.run_if(in_state(MinigameState::Quiz))
                             .run_if(in_state(QuizGameState::Choosing)),
+                    handle_inventory_clicks.run_if(in_state(MinigameState::Quiz))
+                            .run_if(in_state(QuizGameState::Choosing)),
+                    handle_item_selection.run_if(in_state(MinigameState::Quiz))
+                            .run_if(in_state(QuizGameState::Browsing)),
                     )
             )
             .add_systems(

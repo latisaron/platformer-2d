@@ -1,5 +1,7 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
+use crate::minigames::quiz::{QuizGameState, inventory::category_popup::setup_category_popup};
+
 pub const INVENTORY_HEADER: &'static str = "quiz_game/inventory_start.png";
 pub const INVENTORY_FOOTER: &'static str = "quiz_game/inventory_end.png";
 pub const HAT_CATEGORY: &'static str = "quiz_game/hat_category.png";
@@ -68,7 +70,17 @@ pub fn setup_inventory_ui(
                 } else {
                     100.
                 };
-            parent.spawn((
+
+            let is_clickable = matches!(
+                item_type,
+                InventoryItemType::Hat
+                    | InventoryItemType::Undershirt
+                    | InventoryItemType::Outershirt
+                    | InventoryItemType::Pants
+                    | InventoryItemType::Shoes
+            );
+
+            let mut entity = parent.spawn((
                 Node {
                     width: Val::Px(430.),
                     height: Val::Px(correct_height),
@@ -76,7 +88,13 @@ pub fn setup_inventory_ui(
                 },
                 ImageNode::new(asset_server.load(*path)),
                 InventoryItem { iitype: item_type.clone(), open: false },
-            )).with_children(|item_parent| {
+            ));
+
+            if is_clickable {
+                entity.insert(Button);
+            }
+
+            entity.with_children(|item_parent| {
                 if !matches!(item_type, InventoryItemType::Header | InventoryItemType::Footer | InventoryItemType::Empty) {
                     item_parent.spawn((
                         Node {
@@ -94,6 +112,49 @@ pub fn setup_inventory_ui(
                     ));
                 }
             });
+            
         }
     });
+}
+
+pub fn handle_inventory_clicks(
+    window: Single<&Window, With<PrimaryWindow>>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut query: Query<
+        (&Interaction, &mut InventoryItem),
+        (Changed<Interaction>, With<Button>)
+    >,
+    mut quiz_game_state: ResMut<NextState<QuizGameState>>,
+) {
+    for (interaction, mut item) in query.iter_mut() {
+        if *interaction == Interaction::Pressed {
+            match item.iitype {
+                InventoryItemType::Hat => {
+                    quiz_game_state.set(QuizGameState::Browsing);
+                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype);
+                }
+                InventoryItemType::Undershirt => {
+                    quiz_game_state.set(QuizGameState::Browsing);
+                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype);
+                }
+                InventoryItemType::Outershirt => {
+                    quiz_game_state.set(QuizGameState::Browsing);
+                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype);
+                }
+                InventoryItemType::Pants => {
+                    quiz_game_state.set(QuizGameState::Browsing);
+                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype);
+                }
+                InventoryItemType::Shoes => {
+                    quiz_game_state.set(QuizGameState::Browsing);
+                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype);
+                }
+                _ => {}
+            }
+
+            // example: toggle state
+            item.open = !item.open;
+        }
+    }
 }

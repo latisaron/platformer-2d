@@ -69,9 +69,9 @@ pub fn setup_mumbo_jumbo(
 
 pub fn animate_mumbo_jumbo(
     time: Res<Time>,
-    gun: Single<(&mut AnimationConfig, &mut Sprite, &mut MumboJumbo)>,
+    mj: Single<(&mut AnimationConfig, &mut Sprite, &mut MumboJumbo)>,
 ) {
-    let (mut config, mut sprite, mut mumbo_jumbo) = gun.into_inner();
+    let (mut config, mut sprite, mut mumbo_jumbo) = mj.into_inner();
     config.frame_timer.tick(time.delta());
     if config.frame_timer.just_finished() && let Some(atlas) = &mut sprite.texture_atlas {
         if mumbo_jumbo.up {

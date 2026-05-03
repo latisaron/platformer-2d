@@ -8,7 +8,13 @@ const IMAGE_X_PERCENTAGE: f32 = 0.3;
 const IMAGE_Y_PERCENTAGE: f32 = 0.3;
 
 #[derive(Component)]
-pub struct PlayerModel;
+pub struct PlayerModel {
+    pub hat: Option<String>,
+    pub undershirt: Option<String>,
+    pub outershirt: Option<String>,
+    pub pants: Option<String>,
+    pub shoes: Option<String>,
+}
 
 #[derive(Component)]
 pub struct WhiteBackground;
@@ -29,7 +35,7 @@ pub fn setup_player_model(
             ..default()
         },
         Transform::from_xyz(0., 50., WHITE_FRAME_Z_INDEX),
-        PlayerModel,
+        PlayerModel { hat: None, undershirt: None, outershirt: None, pants: None, shoes: None, },
     ));
 
     commands.spawn((
@@ -40,6 +46,6 @@ pub fn setup_player_model(
             ..default()
         },
         Transform::from_xyz(0., 50., PLAYER_MODEL_Z_INDEX),
-        PlayerModel,
+        WhiteBackground,
     ));
 }
