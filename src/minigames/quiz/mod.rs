@@ -4,7 +4,7 @@ use crate::minigames::{
     MinigameState,
     quiz::{
         inventory::{
-            basic::{handle_inventory_clicks, setup_inventory_ui}, category_popup::handle_item_selection, player_model::setup_player_model
+            basic::{handle_inventory_clicks, setup_inventory_ui}, category_popup::{handle_item_selection, handle_outside_popup_click}, cleanup::cleanup_category_entities, player_model::setup_player_model
         },
         level::setup_minigame_level, menu::{continue_quiz_game, exit_quiz_game, setup_quiz_menu, setup_win_menu}, password_popup::{
             alarm::start_alarm, cleanup::cleanup_password_popup_entities, close::{
@@ -74,6 +74,8 @@ impl Plugin for QuizMinigamePlugin {
                             .run_if(in_state(QuizGameState::Choosing)),
                     handle_item_selection.run_if(in_state(MinigameState::Quiz))
                             .run_if(in_state(QuizGameState::Browsing)),
+                    handle_outside_popup_click.run_if(in_state(MinigameState::Quiz))
+                            .run_if(in_state(QuizGameState::Browsing)),
                     )
             )
             .add_systems(
@@ -142,6 +144,10 @@ impl Plugin for QuizMinigamePlugin {
             .add_systems(
                 OnExit(GameState::Menu),
                 cleanup_menu,
+            )
+            .add_systems(
+                OnExit(QuizGameState::Browsing),
+                cleanup_category_entities,
             );
 
 

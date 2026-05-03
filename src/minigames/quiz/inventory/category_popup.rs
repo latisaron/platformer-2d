@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::minigames::quiz::inventory::{basic::InventoryItemType, player_model::PlayerModel};
+use crate::minigames::quiz::{QuizGameState, inventory::{basic::InventoryItemType, cleanup::{CleanupInventory, CleanupCategory}, player_model::PlayerModel}};
 
 #[derive(Component)]
 pub struct CategoryPopup {
@@ -101,6 +101,7 @@ pub fn setup_category_popup(
         },
         ImageNode::new(asset_server.load("quiz_game/category_popup.png")),
         CategoryPopup { iitype: category_type.clone() },
+        CleanupCategory,
     ))
     .with_children(|parent| {
         for path in items.iter() {
@@ -119,10 +120,43 @@ pub fn setup_category_popup(
                 },
                 ImageNode::new(asset_server.load(path)),
                 CategoryPopupItem { path: path.clone(), selected: false },
+                CleanupCategory
             ));
         }
     });
 
+}
+
+pub fn handle_outside_popup_click(
+    mut commands: Commands,
+    window: Single<&Window, With<PrimaryWindow>>,
+    keys: Res<ButtonInput<MouseButton>>,
+    popup: Single<Entity, With<CategoryPopup>>,
+    mut quiz_game_state: ResMut<NextState<QuizGameState>>,
+) {
+    let max_width = window.width();
+    let max_height = window.height();
+
+    let popup_width = max_width * 0.8;
+    let popup_height = max_height * 0.8;
+
+    let lwr_x = -popup_width / 2.;
+    let upr_x = popup_width / 2.;
+    let lwr_y = - popup_height / 2.;
+    let upr_y = popup_height / 2.;
+
+
+    if keys.just_pressed(MouseButton::Left) {
+        if let Some(position) = window.cursor_position() {
+            let x =  position[0] - window.width() / 2.0;
+            let y = -(position[1] - window.height() / 2.0);
+
+            if x < lwr_x || x > upr_x || y < lwr_y || y > upr_y {
+                commands.entity(popup.entity()).despawn();
+                quiz_game_state.set(QuizGameState::Choosing);
+            }
+        }
+    }
 }
 
 pub fn handle_item_selection(
