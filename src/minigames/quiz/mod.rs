@@ -3,7 +3,7 @@ use bevy::{prelude::*};
 use crate::minigames::{
     MinigameState,
     quiz::{
-        inventory::{
+        cleanup::cleanup_quiz_game, inventory::{
             basic::{
                 handle_inventory_clicks,
                 setup_inventory_ui},
@@ -16,8 +16,7 @@ use crate::minigames::{
                 setup_player_model,
                 spawn_player_model,
             },
-        },
-        level::setup_minigame_level, menu::{continue_quiz_game, exit_quiz_game, setup_quiz_menu, setup_win_menu}, password_popup::{
+        }, level::setup_minigame_level, menu::{continue_quiz_game, exit_quiz_game, setup_quiz_menu, setup_win_menu}, password_popup::{
             alarm::start_alarm, cleanup::cleanup_password_popup_entities, close::{
                 handle_close_click, setup_close_button
             }, error::{despawn_error_if_done, setup_error_flash_popup}, mumbo_jumbo::{
@@ -29,7 +28,6 @@ use crate::minigames::{
                 handle_submit_click, setup_submit_button
             }, win::{despawn_win_if_done, setup_win_flash_popup}
         }, request_review_button::{
-            cleanup_request_review_button,
             handle_request_review_button_interaction,
             setup_review_request_button
         }, score::setup_minigame_score
@@ -42,6 +40,7 @@ pub mod password_popup;
 pub mod level;
 pub mod menu;
 pub mod score;
+pub mod cleanup;
 
 #[derive(States, Hash, PartialEq, Eq, Debug, Clone)]
 pub enum QuizGameState {
@@ -72,7 +71,7 @@ impl Plugin for QuizMinigamePlugin {
             .add_systems(
                 OnExit(MinigameState::Quiz),
                 (
-                    cleanup_request_review_button,
+                    cleanup_quiz_game,
                     cleanup_level,
                     cleanup_score,
                 ),

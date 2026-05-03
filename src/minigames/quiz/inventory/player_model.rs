@@ -1,14 +1,7 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::minigames::quiz::inventory::{
-    HAT_Z_INDEX,
-    UNDERSHIRT_Z_INDEX,
-    OUTERSHIRT_Z_INDEX,
-    PANTS_Z_INDEX,
-    SHOES_Z_INDEX,
-    PLAYER_MODEL_Z_INDEX,
-    WHITE_FRAME_Z_INDEX,
-    basic::InventoryItemType};
+use crate::minigames::quiz::{cleanup::CleanupQuiz, inventory::{
+    HAT_Z_INDEX, OUTERSHIRT_Z_INDEX, PANTS_Z_INDEX, PLAYER_MODEL_Z_INDEX, SHOES_Z_INDEX, UNDERSHIRT_Z_INDEX, WHITE_FRAME_Z_INDEX, basic::InventoryItemType}};
 
 const IMAGE_WIDTH_PERCENTAGE: f32 = 0.3;
 const IMAGE_HEIGH_PERCENTAGE: f32 = 0.8;
@@ -109,7 +102,8 @@ impl PlayerModel {
             },
             Transform::from_xyz(0., item_y, HAT_Z_INDEX),
             WhiteBackground,
-            ClothingItem { iitype: InventoryItemType::Hat }
+            ClothingItem { iitype: InventoryItemType::Hat },
+            CleanupQuiz,
         ));
     }
 
@@ -140,7 +134,8 @@ impl PlayerModel {
             },
             Transform::from_xyz(0., item_y, UNDERSHIRT_Z_INDEX),
             WhiteBackground,
-            ClothingItem { iitype: InventoryItemType::Undershirt }
+            ClothingItem { iitype: InventoryItemType::Undershirt },
+            CleanupQuiz,
         ));
     }
 
@@ -171,7 +166,8 @@ impl PlayerModel {
             },
             Transform::from_xyz(0., item_y, OUTERSHIRT_Z_INDEX),
             WhiteBackground,
-            ClothingItem { iitype: InventoryItemType::Outershirt }
+            ClothingItem { iitype: InventoryItemType::Outershirt },
+            CleanupQuiz,
         ));
     }
 
@@ -202,7 +198,8 @@ impl PlayerModel {
             },
             Transform::from_xyz(0., item_y, PANTS_Z_INDEX),
             WhiteBackground,
-            ClothingItem { iitype: InventoryItemType::Pants }
+            ClothingItem { iitype: InventoryItemType::Pants },
+            CleanupQuiz,
         ));
     }
 
@@ -233,7 +230,8 @@ impl PlayerModel {
             },
             Transform::from_xyz(0., item_y, SHOES_Z_INDEX),
             WhiteBackground,
-            ClothingItem { iitype: InventoryItemType::Shoes }
+            ClothingItem { iitype: InventoryItemType::Shoes },
+            CleanupQuiz,
         ));
     }
 }

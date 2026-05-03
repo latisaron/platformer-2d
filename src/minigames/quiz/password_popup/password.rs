@@ -1,6 +1,6 @@
 use bevy::{prelude::*};
 
-use crate::minigames::{quiz::{level::target_score_hash, password_popup::cleanup::CleanupPasswordPopup}, shared::level::Level};
+use crate::minigames::{quiz::{cleanup::CleanupQuiz, level::target_score_hash, password_popup::cleanup::CleanupPasswordPopup}, shared::level::Level};
 
 #[derive(Component)]
 pub struct Password {
@@ -27,6 +27,7 @@ pub fn create_password(
             (
                 Password { secret: actual_string, current_password: String::from("") },
                 CleanupPasswordPopup,
+                CleanupQuiz,
             )
         );
     }

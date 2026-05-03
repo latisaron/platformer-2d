@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::minigames::quiz::{QuizGameState, inventory::{basic::InventoryItemType, cleanup::{CleanupCategory, CleanupInventory}, player_model::{ClothingItem, PlayerModel}}};
+use crate::minigames::quiz::{QuizGameState, cleanup::CleanupQuiz, inventory::{basic::InventoryItemType, cleanup::{CleanupCategory, CleanupInventory}, player_model::{ClothingItem, PlayerModel}}};
 
 #[derive(Component)]
 pub struct CategoryPopup {
@@ -116,6 +116,7 @@ pub fn setup_category_popup(
         ImageNode::new(asset_server.load("quiz_game/category_popup.png")),
         CategoryPopup { iitype: category_type.clone() },
         CleanupCategory,
+        CleanupQuiz,
     ))
     .with_children(|parent| {
         for path in items.iter() {

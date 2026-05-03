@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::minigames::quiz::QuizGameState;
+use crate::minigames::quiz::{QuizGameState, cleanup::CleanupQuiz};
 
 const IMAGE_WIDTH_PERCENTAGE: f32 = 0.15;
 const IMAGE_HEIGH_PERCENTAGE: f32 = 0.1;
@@ -11,9 +11,6 @@ const PADDING: f32 = 20.;
 
 #[derive(Component)]
 pub struct RequestReviewButton;
-
-#[derive(Component)]
-pub struct CleanupRequestReviewButton;
 
 pub fn create_request_button(
     commands: &mut Commands,
@@ -32,7 +29,7 @@ pub fn create_request_button(
         },
         Transform::from_xyz(0., -(window_height / 2. - IMAGE_HEIGH_PERCENTAGE * window_height / 2. - PADDING), IMAGE_Z_INDEX),
         RequestReviewButton,
-        CleanupRequestReviewButton,
+        CleanupQuiz,
     ));
 }
 
@@ -66,27 +63,5 @@ pub fn handle_request_review_button_interaction(
                 quiz_game_state.set(QuizGameState::PasswordPopup);
             }
         }
-    }
-}
-
-pub fn restart_password(
-    commands: &mut Commands,
-    asset_server: &mut ResMut<AssetServer>,
-    window: &Single<&Window, With<PrimaryWindow>>,
-    // cleanup
-    password_entities: &Query<Entity, With<CleanupRequestReviewButton>>,
-) {
-    for entity in password_entities {
-        commands.entity(entity).despawn();
-    }
-    create_request_button(commands, asset_server, window);
-}
-
-pub fn cleanup_request_review_button(
-    mut commands: Commands,
-    password_entities: Query<Entity, With<CleanupRequestReviewButton>>,
-) {
-    for entity in password_entities {
-        commands.entity(entity).despawn();
     }
 }

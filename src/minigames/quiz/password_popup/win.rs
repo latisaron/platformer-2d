@@ -1,6 +1,6 @@
 use bevy::{prelude::*};
 
-use crate::minigames::quiz::{QuizGameState, password_popup::{cleanup::CleanupPasswordPopup, popup::{POPUP_HEIGHT, POPUP_WIDTH, POPUP_X, POPUP_Y}}};
+use crate::minigames::quiz::{QuizGameState, cleanup::CleanupQuiz, password_popup::{cleanup::CleanupPasswordPopup, popup::{POPUP_HEIGHT, POPUP_WIDTH, POPUP_X, POPUP_Y}}};
 
 const DEFAULT_WIN_TIME: f32 = 5.;
 
@@ -23,6 +23,7 @@ pub fn setup_win_flash_popup(
         Transform::from_xyz(POPUP_X, POPUP_Y, 8.),
         WinFlashPopup { remaining_time: DEFAULT_WIN_TIME },
         CleanupPasswordPopup,
+        CleanupQuiz,
     ));
 }
 

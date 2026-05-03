@@ -1,9 +1,8 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
 use crate::minigames::quiz::{
-    QuizGameState,
-    password_popup::{
-        cleanup::CleanupPasswordPopup, password::Password, popup::{POPUP_HEIGHT, POPUP_WIDTH}},
+    QuizGameState, cleanup::CleanupQuiz, password_popup::{
+        cleanup::CleanupPasswordPopup, password::Password, popup::{POPUP_HEIGHT, POPUP_WIDTH}}
     };
 
 const BUTTON_WIDTH: f32 = 320.;
@@ -28,6 +27,7 @@ pub fn create_close_button(
         Transform::from_xyz(- POPUP_WIDTH / 4., - POPUP_HEIGHT * 3. / 8., BUTTON_Z_INDEX),
         CloseButton,
         CleanupPasswordPopup,
+        CleanupQuiz,
     ));
 }
 

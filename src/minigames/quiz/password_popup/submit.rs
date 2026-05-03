@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::minigames::{quiz::{level::target_score_hash, password_popup::{
+use crate::minigames::{quiz::{cleanup::CleanupQuiz, level::target_score_hash, password_popup::{
         cleanup::CleanupPasswordPopup, password::Password, popup::{
             POPUP_HEIGHT,
             POPUP_WIDTH,
@@ -31,6 +31,7 @@ pub fn create_submit_button(
         Transform::from_xyz(POPUP_WIDTH / 4., - POPUP_HEIGHT * 3. / 8., BUTTON_Z_INDEX),
         SubmitButton,
         CleanupPasswordPopup,
+        CleanupQuiz,
     ));
 }
 

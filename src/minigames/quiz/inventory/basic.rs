@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::minigames::quiz::{QuizGameState, inventory::{category_popup::setup_category_popup, cleanup::CleanupInventory, player_model::PlayerModel}};
+use crate::minigames::quiz::{QuizGameState, cleanup::CleanupQuiz, inventory::{category_popup::setup_category_popup, cleanup::CleanupInventory, player_model::PlayerModel}};
 
 pub const INVENTORY_HEADER: &'static str = "quiz_game/inventory_start.png";
 pub const INVENTORY_FOOTER: &'static str = "quiz_game/inventory_end.png";
@@ -50,7 +50,8 @@ pub fn setup_inventory_ui(
             top: Val::Px(0.0),
             ..default()
         },
-        CleanupInventory
+        CleanupInventory,
+        CleanupQuiz,
     ))
     .with_children(|parent| {
         let items = [
@@ -89,7 +90,8 @@ pub fn setup_inventory_ui(
                 },
                 ImageNode::new(asset_server.load(*path)),
                 InventoryItem { iitype: item_type.clone(), open: false },
-                CleanupInventory
+                CleanupInventory,
+                CleanupQuiz,
             ));
 
             if is_clickable {
@@ -111,7 +113,8 @@ pub fn setup_inventory_ui(
                             ..default()
                         },
                         ImageNode::new(asset_server.load(RIGHT_ARROW)),
-                        CleanupInventory
+                        CleanupInventory,
+                        CleanupQuiz,
                     ));
                 }
             });

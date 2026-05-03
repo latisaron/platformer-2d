@@ -1,10 +1,10 @@
 use bevy::{prelude::*};
 
 use crate::minigames::quiz::{
-    password_popup::{
+    cleanup::CleanupQuiz, password_popup::{
         cleanup::CleanupPasswordPopup,
-        password::{Password},
-    },
+        password::Password,
+    }
 };
 
 pub const POPUP_WIDTH: f32 = 800.;
@@ -32,6 +32,7 @@ pub fn create_password_popup(
         Transform::from_xyz(POPUP_X, POPUP_Y, POPUP_Z_INDEX),
         PasswordPopup,
         CleanupPasswordPopup,
+        CleanupQuiz,
     ));
 }
 

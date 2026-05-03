@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use bevy::{prelude::*};
 
-use crate::minigames::quiz::password_popup::{cleanup::CleanupPasswordPopup, mumbo_jumbo, popup::{POPUP_HEIGHT, POPUP_WIDTH, POPUP_X, POPUP_Y}};
+use crate::minigames::quiz::{cleanup::CleanupQuiz, password_popup::{cleanup::CleanupPasswordPopup, mumbo_jumbo, popup::{POPUP_HEIGHT, POPUP_WIDTH, POPUP_X, POPUP_Y}}};
 
 #[derive(Component)]
 pub struct MumboJumbo {
@@ -64,6 +64,7 @@ pub fn setup_mumbo_jumbo(
         mumbo_jumbo_animation_config,
         CleanupPasswordPopup,
         MumboJumbo { up: true },
+        CleanupQuiz,
     ));
 }
 
