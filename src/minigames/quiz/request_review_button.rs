@@ -5,7 +5,7 @@ use crate::minigames::quiz::{QuizGameState, cleanup::CleanupQuiz};
 const IMAGE_WIDTH_PERCENTAGE: f32 = 0.15;
 const IMAGE_HEIGH_PERCENTAGE: f32 = 0.1;
 
-const IMAGE_Z_INDEX: f32 = 0.;
+const IMAGE_Z_INDEX: f32 = 15.;
 
 const PADDING: f32 = 20.;
 

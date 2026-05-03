@@ -3,7 +3,10 @@ use bevy::{prelude::*};
 use crate::minigames::{
     MinigameState,
     quiz::{
-        cleanup::cleanup_quiz_game, inventory::{
+        cleanup::{
+            cleanup_quiz_game,
+            reset_quiz_game_state,
+        }, inventory::{
             basic::{
                 handle_inventory_clicks,
                 setup_inventory_ui},
@@ -11,7 +14,9 @@ use crate::minigames::{
                 handle_item_selection,
                 handle_outside_popup_click,
             },
-            cleanup::cleanup_category_entities,
+            cleanup::{
+                cleanup_category_entities,
+            },
             player_model::{
                 setup_player_model,
                 spawn_player_model,
@@ -60,6 +65,7 @@ impl Plugin for QuizMinigamePlugin {
             .add_systems(
             OnEnter(MinigameState::Quiz),
                 (
+                    reset_quiz_game_state,
                     setup_minigame_level,
                     setup_minigame_score,
                     setup_review_request_button,

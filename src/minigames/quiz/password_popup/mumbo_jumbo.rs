@@ -60,7 +60,7 @@ pub fn setup_mumbo_jumbo(
             image_mode: SpriteImageMode::Auto,
             ..default()
         },
-        Transform::from_xyz(mumbo_jumbo_x, mumbo_jumbo_y, 6.),
+        Transform::from_xyz(mumbo_jumbo_x, mumbo_jumbo_y, 16.),
         mumbo_jumbo_animation_config,
         CleanupPasswordPopup,
         MumboJumbo { up: true },

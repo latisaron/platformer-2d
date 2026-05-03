@@ -13,7 +13,7 @@ pub const POPUP_HEIGHT: f32 = 600.;
 pub const POPUP_X: f32 = 0.;
 pub const POPUP_Y: f32 = 0.;
 
-const POPUP_Z_INDEX: f32 = 5.;
+const POPUP_Z_INDEX: f32 = 15.;
 
 #[derive(Component)]
 pub struct PasswordPopup;

@@ -8,7 +8,7 @@ use crate::minigames::quiz::{
 const BUTTON_WIDTH: f32 = 320.;
 const BUTTON_HEIGHT: f32 = 80.;
 
-const BUTTON_Z_INDEX: f32 = 6.;
+const BUTTON_Z_INDEX: f32 = 16.;
 
 #[derive(Component)]
 pub struct CloseButton;

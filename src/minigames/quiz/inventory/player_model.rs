@@ -240,13 +240,16 @@ impl PlayerModel {
 pub struct WhiteBackground;
 
 pub fn spawn_player_model(mut commands: Commands) {
-    commands.spawn(PlayerModel {
-        hat: None,
-        undershirt: None,
-        outershirt: None,
-        pants: None,
-        shoes: None,
-    });
+    commands.spawn((PlayerModel {
+            hat: None,
+            undershirt: None,
+            outershirt: None,
+            pants: None,
+            shoes: None,
+        },
+        CleanupQuiz,
+    ));
+
 }
 
 pub fn setup_player_model(
