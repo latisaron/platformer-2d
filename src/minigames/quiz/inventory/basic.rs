@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::minigames::quiz::{QuizGameState, inventory::{category_popup::setup_category_popup, cleanup::CleanupInventory}};
+use crate::minigames::quiz::{QuizGameState, inventory::{category_popup::setup_category_popup, cleanup::CleanupInventory, player_model::PlayerModel}};
 
 pub const INVENTORY_HEADER: &'static str = "quiz_game/inventory_start.png";
 pub const INVENTORY_FOOTER: &'static str = "quiz_game/inventory_end.png";
@@ -129,29 +129,30 @@ pub fn handle_inventory_clicks(
         (Changed<Interaction>, With<Button>)
     >,
     mut quiz_game_state: ResMut<NextState<QuizGameState>>,
+    player_model: Single<&PlayerModel>,
 ) {
     for (interaction, mut item) in query.iter_mut() {
         if *interaction == Interaction::Pressed {
             match item.iitype {
                 InventoryItemType::Hat => {
                     quiz_game_state.set(QuizGameState::Browsing);
-                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype);
+                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype, &player_model);
                 }
                 InventoryItemType::Undershirt => {
                     quiz_game_state.set(QuizGameState::Browsing);
-                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype);
+                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype, &player_model);
                 }
                 InventoryItemType::Outershirt => {
                     quiz_game_state.set(QuizGameState::Browsing);
-                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype);
+                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype, &player_model);
                 }
                 InventoryItemType::Pants => {
                     quiz_game_state.set(QuizGameState::Browsing);
-                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype);
+                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype, &player_model);
                 }
                 InventoryItemType::Shoes => {
                     quiz_game_state.set(QuizGameState::Browsing);
-                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype);
+                    setup_category_popup(&window, &mut commands, &asset_server, &item.iitype, &player_model);
                 }
                 _ => {}
             }

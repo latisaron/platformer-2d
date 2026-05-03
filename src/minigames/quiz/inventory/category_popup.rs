@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::minigames::quiz::{QuizGameState, inventory::{basic::InventoryItemType, cleanup::{CleanupInventory, CleanupCategory}, player_model::PlayerModel}};
+use crate::minigames::quiz::{QuizGameState, inventory::{basic::InventoryItemType, cleanup::{CleanupCategory, CleanupInventory}, player_model::{ClothingItem, PlayerModel}}};
 
 #[derive(Component)]
 pub struct CategoryPopup {
@@ -17,7 +17,8 @@ fn map_items(iitype: &InventoryItemType) -> Vec<String> {
     match *iitype {
         InventoryItemType::Hat => {
             return vec![
-                String::from("quiz_game/hats/green.png"),
+                String::from("quiz_game/hats/0.png"),
+                String::from("quiz_game/hats/1.png"),
                 String::from("quiz_game/hats/green.png"),
                 String::from("quiz_game/hats/green.png"),
                 String::from("quiz_game/hats/green.png"),
@@ -38,16 +39,28 @@ fn map_items(iitype: &InventoryItemType) -> Vec<String> {
             ];
         },
         InventoryItemType::Undershirt => {
-            return vec![String::from("quiz_game/hats/green.png")];
+            return vec![
+                String::from("quiz_game/undershirts/0.png"),
+                String::from("quiz_game/undershirts/1.png"),
+            ];
         },
         InventoryItemType::Outershirt => {
-            return vec![String::from("quiz_game/hats/green.png")];
+            return vec![
+                String::from("quiz_game/outershirts/0.png"),
+                String::from("quiz_game/outershirts/1.png"),
+            ];
         },
         InventoryItemType::Pants => {
-            return vec![String::from("quiz_game/hats/green.png")];
+            return vec![
+                String::from("quiz_game/pants/0.png"),
+                String::from("quiz_game/pants/1.png"),
+            ];
         },
         InventoryItemType::Shoes => {
-            return vec![String::from("quiz_game/hats/green.png")];
+            return vec![
+                String::from("quiz_game/shoes/0.png"),
+                String::from("quiz_game/shoes/1.png"),
+            ];
         },
         _ => {
             return vec![];
@@ -60,6 +73,7 @@ pub fn setup_category_popup(
     commands: &mut Commands,
     asset_server: &Res<AssetServer>,
     category_type: &InventoryItemType,
+    player_model: &Single<&PlayerModel>,
 ) {
     let max_width = window.width();
     let max_height = window.height();
@@ -105,6 +119,9 @@ pub fn setup_category_popup(
     ))
     .with_children(|parent| {
         for path in items.iter() {
+            let selected = player_model.is_selected(category_type.clone(), path.clone());
+            let outline_color = if selected { Color::srgb(1.0, 1.0, 0.0) } else { Color::BLACK };
+
             parent.spawn((
                 Button,
                 Node {
@@ -116,11 +133,11 @@ pub fn setup_category_popup(
                 Outline {
                     width: Val::Px(2.),
                     offset: Val::Px(0.),
-                    color: Color::BLACK,
+                    color: outline_color,
                 },
                 ImageNode::new(asset_server.load(path)),
-                CategoryPopupItem { path: path.clone(), selected: false },
-                CleanupCategory
+                CategoryPopupItem { path: path.clone(), selected },
+                CleanupCategory,
             ));
         }
     });
@@ -160,6 +177,12 @@ pub fn handle_outside_popup_click(
 }
 
 pub fn handle_item_selection(
+    // changing player clothing
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    window: Single<&Window, With<PrimaryWindow>>,
+    clothing_items_query: Query<(Entity, &ClothingItem)>,
+    // actual category logic
     category: Single<&CategoryPopup>,
     mut params: ParamSet<(
         Query<(Entity, &Interaction, &CategoryPopupItem), (Changed<Interaction>, With<Button>)>,
@@ -179,6 +202,15 @@ pub fn handle_item_selection(
     if let Some((pressed_entity, ref path)) = pressed {
         for (entity, mut item, mut outline) in params.p1().iter_mut() {
             if entity == pressed_entity {
+                match category.iitype {
+                    InventoryItemType::Hat => player_model.change_hat(&mut commands, &asset_server, &window, &clothing_items_query, item.path.clone()),
+                    InventoryItemType::Undershirt => player_model.change_undershirt(&mut commands, &asset_server, &window, &clothing_items_query, item.path.clone()),
+                    InventoryItemType::Outershirt => player_model.change_outershirt(&mut commands, &asset_server, &window, &clothing_items_query, item.path.clone()),
+                    InventoryItemType::Pants => player_model.change_pants(&mut commands, &asset_server, &window, &clothing_items_query, item.path.clone()),
+                    InventoryItemType::Shoes => player_model.change_shoes(&mut commands, &asset_server, &window, &clothing_items_query, item.path.clone()),
+                    _ => {}
+                }
+
                 item.selected = true;
                 outline.color = Color::srgb(1.0, 1.0, 0.0);
             } else {
