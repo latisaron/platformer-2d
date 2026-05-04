@@ -92,6 +92,7 @@ pub fn setup_inventory_ui(
                 InventoryItem { iitype: item_type.clone(), open: false },
                 CleanupInventory,
                 CleanupQuiz,
+                ZIndex(19),
             ));
 
             if is_clickable {

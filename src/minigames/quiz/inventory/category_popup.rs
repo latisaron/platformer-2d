@@ -78,7 +78,9 @@ fn map_items(iitype: &InventoryItemType) -> Vec<String> {
                 String::from("quiz_game/pants/7.png"),
                 String::from("quiz_game/pants/8.png"),
                 String::from("quiz_game/pants/9.png"),
+                String::from("quiz_game/pants/10.png"),
                 String::from("quiz_game/pants/11.png"),
+                String::from("quiz_game/pants/12.png"),
             ];
         },
         InventoryItemType::Shoes => {
@@ -86,12 +88,12 @@ fn map_items(iitype: &InventoryItemType) -> Vec<String> {
                 String::from("quiz_game/shoes/0.png"),
                 String::from("quiz_game/shoes/1.png"),
                 String::from("quiz_game/shoes/2.png"),
-                String::from("quiz_game/shoes/3.png"),
-                String::from("quiz_game/shoes/4.png"),
                 String::from("quiz_game/shoes/5.png"),
                 String::from("quiz_game/shoes/6.png"),
                 String::from("quiz_game/shoes/7.png"),
                 String::from("quiz_game/shoes/8.png"),
+                String::from("quiz_game/shoes/9.png"),
+                String::from("quiz_game/shoes/10.png"),
             ];
         },
         _ => {
@@ -148,6 +150,7 @@ pub fn setup_category_popup(
         ImageNode::new(asset_server.load("quiz_game/category_popup.png")),
         CategoryPopup { iitype: category_type.clone() },
         CleanupCategory,
+        ZIndex(20),
         CleanupQuiz,
     ))
     .with_children(|parent| {
@@ -169,6 +172,7 @@ pub fn setup_category_popup(
                     color: outline_color,
                 },
                 ImageNode::new(asset_server.load(path)),
+                ZIndex(21),
                 CategoryPopupItem { path: path.clone(), selected },
                 CleanupCategory,
             ));

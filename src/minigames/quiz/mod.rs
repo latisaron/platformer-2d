@@ -3,7 +3,7 @@ use bevy::{prelude::*};
 use crate::minigames::{
     MinigameState,
     quiz::{
-        cleanup::{
+        background::create_background, cleanup::{
             cleanup_quiz_game,
             reset_quiz_game_state,
         }, inventory::{
@@ -14,9 +14,7 @@ use crate::minigames::{
                 handle_item_selection,
                 handle_outside_popup_click,
             },
-            cleanup::{
-                cleanup_category_entities,
-            },
+            cleanup::cleanup_category_entities,
             player_model::{
                 setup_player_model,
                 spawn_player_model,
@@ -46,6 +44,7 @@ pub mod level;
 pub mod menu;
 pub mod score;
 pub mod cleanup;
+pub mod background;
 
 #[derive(States, Hash, PartialEq, Eq, Debug, Clone)]
 pub enum QuizGameState {
@@ -72,6 +71,7 @@ impl Plugin for QuizMinigamePlugin {
                     spawn_player_model,
                     setup_player_model,
                     setup_inventory_ui,
+                    create_background,
                 ).chain()
             )
             .add_systems(
