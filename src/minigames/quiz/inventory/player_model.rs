@@ -3,7 +3,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use crate::minigames::quiz::{cleanup::CleanupQuiz, inventory::{
     HAT_Z_INDEX, OUTERSHIRT_Z_INDEX, PANTS_Z_INDEX, PLAYER_MODEL_Z_INDEX, SHOES_Z_INDEX, UNDERSHIRT_Z_INDEX, WHITE_FRAME_Z_INDEX, basic::InventoryItemType}};
 
-const IMAGE_WIDTH_PERCENTAGE: f32 = 0.3;
+const IMAGE_WIDTH_PERCENTAGE: f32 = 0.2;
 const IMAGE_HEIGH_PERCENTAGE: f32 = 0.8;
 
 #[derive(Component)]
@@ -89,14 +89,13 @@ impl PlayerModel {
         let window_height = window.height();
 
         let image_height = IMAGE_HEIGH_PERCENTAGE * window_height;
-        
-        let item_height = 0.3707 * image_height;
-        let item_y: f32 = -(0.187 * image_height - image_height / 2.);
+        let image_width = IMAGE_WIDTH_PERCENTAGE * window_width;
+        let item_y: f32 = 50.;
 
         commands.spawn((
             Sprite {
                 image: asset_server.load(path),
-                custom_size: Some(Vec2::new(IMAGE_WIDTH_PERCENTAGE * window_width, item_height)),
+                custom_size: Some(Vec2::new(image_width, image_height)),
                 image_mode: SpriteImageMode::Auto,
                 ..default()
             },
@@ -121,14 +120,13 @@ impl PlayerModel {
         let window_height = window.height();
 
         let image_height = IMAGE_HEIGH_PERCENTAGE * window_height;
-        
-        let item_height = 0.2721 * image_height;
-        let item_y: f32 = -(0.5068 * image_height - image_height / 2.);
+        let image_width = IMAGE_WIDTH_PERCENTAGE * window_width;
+        let item_y: f32 = 50.;
 
         commands.spawn((
             Sprite {
                 image: asset_server.load(path),
-                custom_size: Some(Vec2::new(IMAGE_WIDTH_PERCENTAGE * window_width, item_height)),
+                custom_size: Some(Vec2::new(image_width, image_height)),
                 image_mode: SpriteImageMode::Auto,
                 ..default()
             },
@@ -153,14 +151,13 @@ impl PlayerModel {
         let window_height = window.height();
 
         let image_height = IMAGE_HEIGH_PERCENTAGE * window_height;
-        
-        let item_height = 0.2721 * image_height;
-        let item_y: f32 = -(0.5068 * image_height - image_height / 2.);
+        let image_width = IMAGE_WIDTH_PERCENTAGE * window_width;
+        let item_y: f32 = 50.;
 
         commands.spawn((
             Sprite {
                 image: asset_server.load(path),
-                custom_size: Some(Vec2::new(IMAGE_WIDTH_PERCENTAGE * window_width, item_height)),
+                custom_size: Some(Vec2::new(image_width, image_height)),
                 image_mode: SpriteImageMode::Auto,
                 ..default()
             },
@@ -185,14 +182,13 @@ impl PlayerModel {
         let window_height = window.height();
 
         let image_height = IMAGE_HEIGH_PERCENTAGE * window_height;
-        
-        let item_height = 0.3571 * image_height;
-        let item_y: f32 = -(0.8214 * image_height - image_height / 2.);
+        let image_width = IMAGE_WIDTH_PERCENTAGE * window_width;
+        let item_y: f32 = 50.;
 
         commands.spawn((
             Sprite {
                 image: asset_server.load(path),
-                custom_size: Some(Vec2::new(IMAGE_WIDTH_PERCENTAGE * window_width, item_height)),
+                custom_size: Some(Vec2::new(image_width, image_height)),
                 image_mode: SpriteImageMode::Auto,
                 ..default()
             },
@@ -215,16 +211,15 @@ impl PlayerModel {
         self.shoes = Some(path.clone());
         let window_width = window.width();
         let window_height = window.height();
-
-        let image_height = IMAGE_HEIGH_PERCENTAGE * window_height;
         
-        let item_height = 0.1496 * image_height;
-        let item_y: f32 = -(0.9251 * image_height - image_height / 2.);
+        let image_height = IMAGE_HEIGH_PERCENTAGE * window_height;
+        let image_width = IMAGE_WIDTH_PERCENTAGE * window_width;
+        let item_y: f32 = 50.;
 
         commands.spawn((
             Sprite {
                 image: asset_server.load(path),
-                custom_size: Some(Vec2::new(IMAGE_WIDTH_PERCENTAGE * window_width, item_height)),
+                custom_size: Some(Vec2::new(image_width, image_height)),
                 image_mode: SpriteImageMode::Auto,
                 ..default()
             },
@@ -259,6 +254,20 @@ pub fn setup_player_model(
     window: Single<&Window, With<PrimaryWindow>>,
     clothing_items_query: Query<(Entity, &ClothingItem)>,
 ) {
+    let window_width = window.width();
+    let window_height = window.height();
+    commands.spawn((
+        Sprite {
+            image: asset_server.load("quiz_game/raw_woman_naky.png"),
+            custom_size: Some(Vec2::new(IMAGE_WIDTH_PERCENTAGE * window_width, IMAGE_HEIGH_PERCENTAGE * window_height)),
+            image_mode: SpriteImageMode::Auto,
+            ..default()
+        },
+        Transform::from_xyz(0., 50., PLAYER_MODEL_Z_INDEX),
+        CleanupQuiz,
+    ));
+
+
     player_model.change_hat(&mut commands, &asset_server, &window, &clothing_items_query, String::from("quiz_game/hats/0.png"));
     player_model.change_undershirt(&mut commands, &asset_server, &window, &clothing_items_query,  String::from("quiz_game/undershirts/0.png"));
     player_model.change_pants(&mut commands, &asset_server, &window, &clothing_items_query,  String::from("quiz_game/pants/0.png"));

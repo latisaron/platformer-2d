@@ -96,29 +96,7 @@ pub fn setup_inventory_ui(
 
             if is_clickable {
                 entity.insert(Button);
-            }
-
-            entity.with_children(|item_parent| {
-                if !matches!(item_type, InventoryItemType::Header | InventoryItemType::Footer | InventoryItemType::Empty) {
-                    item_parent.spawn((
-                        Node {
-                            width: Val::Px(25.0),
-                            height: Val::Px(25.0),
-                            margin: UiRect {
-                                left: Val::Px(7.0),
-                                right: Val::Px(0.0),
-                                top: Val::Px(37.5),
-                                bottom: Val::Px(37.5),
-                            },
-                            ..default()
-                        },
-                        ImageNode::new(asset_server.load(RIGHT_ARROW)),
-                        CleanupInventory,
-                        CleanupQuiz,
-                    ));
-                }
-            });
-            
+            }            
         }
     });
 }
