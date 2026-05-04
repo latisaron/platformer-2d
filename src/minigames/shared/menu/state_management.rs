@@ -41,17 +41,18 @@ pub fn setup_menu(
     items: Vec<MenuItemType>,
     text: String,
     number_of_items: usize,
-) {
-    let window_width = window.resolution.width();
-    let window_height = window.resolution.height();
-    
+) {    
     commands.spawn((
-        Mesh2d(meshes.add(Rectangle::new(
-            window_width,
-            window_height,
-        ))),
-        MeshMaterial2d(materials.add(Color::srgb(0.0, 0.0, 0.0))),
-        Transform::from_xyz(0., 0.0, 100.),
+        Node {
+            width: Val::Percent(100.),
+            height: Val::Percent(100.),
+            position_type: PositionType::Absolute,
+            left: Val::Px(0.),
+            top: Val::Px(0.),
+            ..default()
+        },
+        BackgroundColor(Color::srgb(0.0, 0.0, 0.0)),
+        ZIndex(99),
         CleanupMenu,
     ));
 
@@ -67,6 +68,7 @@ pub fn setup_menu(
             align_items: AlignItems::Center,
             ..default()
         },
+        ZIndex(100),
         CleanupMenu,
     )).with_children(|parent| {
 
