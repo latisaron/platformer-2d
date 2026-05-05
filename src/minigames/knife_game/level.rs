@@ -1,5 +1,5 @@
 use bevy::{prelude::*};
-use crate::minigames::shared::level::{CleanupLevel, Level};
+use crate::minigames::{main::current_level_state::KnifeLevel, shared::level::{CleanupLevel, Level}};
 
 pub fn knife_hash(level: usize) -> usize {
     match level {
@@ -12,11 +12,13 @@ pub fn knife_hash(level: usize) -> usize {
 
 pub fn setup_minigame_level(
     mut commands: Commands,
+    knife_level: Single<&KnifeLevel>,
 ) {
+    let val = knife_level.val;
     commands.spawn((
         Level {
-            current_value: 1,
-            target_score: knife_hash(1),
+            current_value: val,
+            target_score: knife_hash(val),
             target_time: None,
             bullets: None,
             secret_password: None,

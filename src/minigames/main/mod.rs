@@ -3,19 +3,22 @@ pub mod menu;
 pub mod room;
 pub mod movable_block;
 pub mod cleanup;
+pub mod current_level_state;
 
 use bevy::{prelude::*};
 
 use crate::GameState;
 use crate::minigames::main::cleanup::cleanup_main_game;
 use crate::minigames::main::menu::{exit_game, setup_main_menu, continue_main_game};
-use crate::minigames::main::room::{setup_bookshelf, setup_bed, setup_drawer, setup_floor, setup_walls, setup_heaters, setup_table};
+use crate::minigames::main::room::{setup_bookshelf, setup_bed, setup_drawer, setup_floor, setup_walls, setup_heaters, setup_table, setup_gift};
+use crate::minigames::main::movable_block::{setup_controllable_block, keyboard_input};
 use crate::minigames::shared::menu::menu_action::MenuAction;
 use crate::minigames::shared::menu::state_management::cleanup_menu;
 use crate::minigames::{MinigameState};
 use crate::minigames::main::click::choose_minigame;
 use crate::minigames::shared::menu::user_input::{listen_keystroke_game, listen_keystroke_menu};
 use crate::minigames::shared::score::{display_score};
+use crate::minigames::main::current_level_state::{KnifeLevel, GunLevel, QuizLevel, setup_gun_level, setup_knife_level, setup_quiz_level};
 
 
 pub struct MainMinigamePlugin;
@@ -27,16 +30,26 @@ impl Plugin for MainMinigamePlugin {
             .insert_state(GameState::Play)
             .insert_state(MenuAction::None)
             .add_systems(
+                Startup,
+                (
+                    setup_gun_level,
+                    setup_knife_level,
+                    setup_quiz_level,
+                )
+            )
+            .add_systems(
                 OnEnter(MinigameState::Main),
                 (
                     setup_walls,
                     setup_bookshelf,
                     setup_bed,
                     setup_drawer,
+                    setup_gift,
                     setup_heaters,
                     setup_table,
                     setup_floor,
-                )
+                    setup_controllable_block,
+                ).chain()
             )
             .add_systems(
                 OnExit(MinigameState::Main),
@@ -44,9 +57,13 @@ impl Plugin for MainMinigamePlugin {
             )
             .add_systems(
                 Update,
-                choose_minigame
-                    .run_if(in_state(MinigameState::Main))
-                    .run_if(in_state(GameState::Play))
+                (
+                    choose_minigame.run_if(in_state(MinigameState::Main))
+                        .run_if(in_state(GameState::Play)),
+                    keyboard_input.run_if(in_state(MinigameState::Main))
+                        .run_if(in_state(GameState::Play)),
+
+                )
             )
             .add_systems(
             Update, 

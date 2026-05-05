@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::minigames::{quiz::{cleanup::CleanupQuiz, level::target_score_hash, password_popup::{
+use crate::minigames::{main::current_level_state::QuizLevel, quiz::{cleanup::CleanupQuiz, level::target_score_hash, password_popup::{
         cleanup::CleanupPasswordPopup, password::Password, popup::{
             POPUP_HEIGHT,
             POPUP_WIDTH,
@@ -51,6 +51,7 @@ pub fn handle_submit_click(
     mut menu_state: ResMut<NextState<MenuAction>>,
     mut level: Single<&mut Level>,
     mut score: Single<&mut Score>,
+    mut quiz_level: Single<&QuizLevel>,
 ) {
     if keys.just_pressed(MouseButton::Left) {
         if let Some(position) = window.cursor_position() {
@@ -65,6 +66,7 @@ pub fn handle_submit_click(
             if x >= button_lwr_x && x <= button_upr_x && y >= button_lwr_y && y <= button_upr_y {
                 if password.correct() {
                     current_state.set(QuizGameState::PasswordPopupWin);
+                    quiz_level.val +=1 ;
                     level.current_value += 1;
                     let new_secret = target_score_hash(level.current_value);
                     level.secret_password = Some(new_secret.clone());

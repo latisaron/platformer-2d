@@ -1,6 +1,6 @@
 use bevy::{prelude::*};
 use crate::minigames::{
-    MinigameState, knife_game::{chopping_block::{CleanupChoppingBlock, reset_chopping_block}, knife::{ChoppingGameState, CleanupKnife, reset_knife}, level::knife_hash}, shared::{level::Level, menu::{
+    MinigameState, knife_game::{chopping_block::{CleanupChoppingBlock, reset_chopping_block}, knife::{ChoppingGameState, CleanupKnife, reset_knife}, level::knife_hash}, main::current_level_state::KnifeLevel, shared::{level::Level, menu::{
         menu_action::MenuAction,
         menu_item_type::MenuItemType,
         state_management::{
@@ -60,9 +60,11 @@ pub fn setup_win_menu(
     mut menu_action_state: ResMut<NextState<MenuAction>>,
     window: Single<& Window>,
     mut level: Single<&mut Level>,
+    mut knife_level: Single<&mut KnifeLevel>,
 ) {
     menu_action_state.set(MenuAction::None);
     level.target_score = knife_hash(level.current_value + 1);
+    knife_level.val += 1;
     level.current_value += 1;
     setup_menu(
         commands,

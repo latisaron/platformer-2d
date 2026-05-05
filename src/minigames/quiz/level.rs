@@ -1,5 +1,5 @@
 use bevy::{prelude::*};
-use crate::minigames::shared::level::{CleanupLevel, Level};
+use crate::minigames::{main::current_level_state::QuizLevel, shared::level::{CleanupLevel, Level}};
 
 pub fn target_score_hash(level: usize) -> String {
     match level {
@@ -12,14 +12,16 @@ pub fn target_score_hash(level: usize) -> String {
 
 pub fn setup_minigame_level(
     mut commands: Commands,
+    quiz_level: Single<&QuizLevel>,
 ) {
+    let val = quiz_level.val;
     commands.spawn((
         Level {
-            current_value: 1,
+            current_value: val,
             target_score: 3,
             target_time: None,
             bullets: None,
-            secret_password: Some(target_score_hash(1)),
+            secret_password: Some(target_score_hash(val)),
         },
         CleanupLevel
     ));

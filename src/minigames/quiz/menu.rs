@@ -44,7 +44,6 @@ pub fn setup_win_menu(
     level.target_time = Some(target_time_hash(level.current_value + 1));
     level.bullets = Some(bullet_hash(level.current_value + 1));
 
-    level.current_value += 1;
     setup_menu(
         commands,
         window,

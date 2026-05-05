@@ -1,7 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use crate::minigames::{
-    MinigameState,
-    shared::{level::Level, menu::{
+    MinigameState, main::current_level_state::GunLevel, shared::{level::Level, menu::{
         menu_action::MenuAction,
         menu_item_type::MenuItemType,
         state_management::{
@@ -68,6 +67,7 @@ pub fn setup_win_menu(
     mut menu_action_state: ResMut<NextState<MenuAction>>,
     window: Single<& Window>,
     mut level: Single<&mut Level>,
+    mut gun_level: Single<&mut GunLevel>,
 ) {
     menu_action_state.set(MenuAction::None);
     level.target_score = target_score_hash(level.current_value + 1);
@@ -75,6 +75,7 @@ pub fn setup_win_menu(
     level.bullets = Some(bullet_hash(level.current_value + 1));
 
     level.current_value += 1;
+    gun_level.val += 1;
     setup_menu(
         commands,
         window,

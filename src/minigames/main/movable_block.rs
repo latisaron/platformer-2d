@@ -16,11 +16,11 @@ pub fn setup_controllable_block(
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
     commands.spawn((
-        Mesh2d(meshes.add(Rectangle::new(50.0, 50.0))),
-        MeshMaterial2d(materials.add(Color::srgb(0.1, 0.0, 0.1))),
+        Mesh2d(meshes.add(Rectangle::new(100.0, 100.0))),
+        MeshMaterial2d(materials.add(Color::srgb(1., 1., 1.))),
     ))
     .insert(RigidBody::Dynamic)
-    .insert(Collider::cuboid(25.0, 25.0))
+    .insert(Collider::cuboid(50.0, 50.0))
     .insert(Restitution {
         coefficient: 0.0,
         combine_rule: CoefficientCombineRule::Min,
@@ -46,19 +46,13 @@ pub fn keyboard_input(
     if keys.pressed(KeyCode::ArrowRight) {
         *dir = Direction::Right;
         vel.linvel.x += SPEED;
-    }
-    
-    if keys.pressed(KeyCode::ArrowLeft) {
+    } else if keys.pressed(KeyCode::ArrowLeft) {
         *dir = Direction::Left;
         vel.linvel.x -= SPEED;
-    }
-    
-    if keys.pressed(KeyCode::ArrowUp) {
+    } else if keys.pressed(KeyCode::ArrowUp) {
         *dir = Direction::Up;
         vel.linvel.y += SPEED;
-    }
-    
-    if keys.pressed(KeyCode::ArrowDown) {
+    } else if keys.pressed(KeyCode::ArrowDown) {
         *dir = Direction::Down;
         vel.linvel.y -= SPEED;
     }

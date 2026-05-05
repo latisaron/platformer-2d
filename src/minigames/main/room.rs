@@ -23,14 +23,18 @@ fn pct_to_world(
 
 fn spawn_solid(
     commands: &mut Commands,
-    materials: &mut ResMut<Assets<ColorMaterial>>,
-    meshes: &mut ResMut<Assets<Mesh>>,
+    asset_server: &Res<AssetServer>,
     x: f32, y: f32, w: f32, h: f32,
     z: f32,
+    path: String,
 ) {
     commands.spawn((
-        Mesh2d(meshes.add(Rectangle::new(w, h))),
-        MeshMaterial2d(materials.add(Color::srgb(1., 1., 1.))),
+        Sprite {
+            image: asset_server.load(&path),
+            custom_size: Some(Vec2::new(w, h)),
+            image_mode: SpriteImageMode::Auto,
+            ..default()
+        },
         Transform::from_xyz(x, y, z),
         Collider::cuboid(w / 2., h / 2.),
         Restitution { coefficient: 0.0, combine_rule: CoefficientCombineRule::Min },
@@ -73,62 +77,70 @@ pub fn setup_walls(
 
 pub fn setup_bed(
     mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
+    asset_server: Res<AssetServer>,
     window: Single<&Window>,
 ) {
     let rw = window.resolution.width();
     let rh = window.resolution.height();
     // dropped center_y 31% → 36%
     let (x, y, w, h) = pct_to_world(12.9, 36.0, 24.9, 62.0, rw, rh);
-    spawn_solid(&mut commands, &mut materials, &mut meshes, x, y, w, h, 1.);
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/couch_gun.png"));
 }
 
 pub fn setup_drawer(
     mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
+    asset_server: Res<AssetServer>,
     window: Single<&Window>,
 ) {
     let rw = window.resolution.width();
     let rh = window.resolution.height();
     // flush with right wall: center_x = 100 - width/2 = 100 - 16.55 = 83.45%
     let (x, y, w, h) = pct_to_world(83.45, 11.0, 33.1, 22.0, rw, rh);
-    spawn_solid(&mut commands, &mut materials, &mut meshes, x, y, w, h, 1.);
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/drawer_angled.png"));
 }
 
 pub fn setup_bookshelf(
     mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
+    asset_server: Res<AssetServer>,
     window: Single<&Window>,
 ) {
     let rw = window.resolution.width();
     let rh = window.resolution.height();
     // far right wall, tall and thin
     // center_x ~93.2%, center_y ~59.2%, width ~13.6%, height ~73.1%
-    let (x, y, w, h) = pct_to_world(93.2, 60., 13.6, 73.9, rw, rh);
-    spawn_solid(&mut commands, &mut materials, &mut meshes, x, y, w, h, 1.);
+    let (x, y, w, h) = pct_to_world(93.2, 60., 30., 73.9, rw, rh);
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/book_shelf_2.png"));
 }
 
 pub fn setup_table(
     mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
+    asset_server: Res<AssetServer>,
     window: Single<&Window>,
 ) {
     let rw = window.resolution.width();
     let rh = window.resolution.height();
     // bottom edge flush with bottom wall: center_y = 100 - height/2 = 100 - 11.9 = 88.1%
     let (x, y, w, h) = pct_to_world(64., 88.1, 43.9, 23.8, rw, rh);
-    spawn_solid(&mut commands, &mut materials, &mut meshes, x, y, w, h, 1.);
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/table.png"));
+}
+
+pub fn setup_gift(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    window: Single<&Window>,
+) {
+    let rw = window.resolution.width();
+    let rh = window.resolution.height();
+    // small square on top-left of drawer
+    // center_x ~57%, center_y ~8%, width ~8%, height ~11%
+    let (x, y, w, h) = pct_to_world(75.0, 20.0, 8.0, 11.0, rw, rh);
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/gift.png"));
 }
 
 
 pub fn setup_heaters(
     mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
+    asset_server: Res<AssetServer>,
     window: Single<&Window>,
 ) {
     let rw = window.resolution.width();
@@ -137,13 +149,14 @@ pub fn setup_heaters(
     // iron heater: left edge flush with left wall (center_x = width/2 = 10.1%)
     // sits slightly above wall heater so they don't overlap
     let (x, y, w, h) = pct_to_world(10.1, 89.5, 20.2, 7.0, rw, rh);
-    spawn_solid(&mut commands, &mut materials, &mut meshes, x, y, w, h, 1.);
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/wall_heater.png"));
 
     // wall heater: flush with bottom wall (center_y = 100 - 3.75 = 96.25%)
     // shifted right enough to not overlap iron heater (right edge of iron = 20.2%, left edge of wall = 20.7%)
     let (x, y, w, h) = pct_to_world(31.0, 96.25, 20.6, 7.5, rw, rh);
-    spawn_solid(&mut commands, &mut materials, &mut meshes, x, y, w, h, 1.);
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/radiator.png"));
 }
+
 pub fn setup_floor(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
