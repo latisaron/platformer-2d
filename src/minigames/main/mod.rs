@@ -1,10 +1,15 @@
 pub mod click;
 pub mod menu;
+pub mod room;
+pub mod movable_block;
+pub mod cleanup;
 
 use bevy::{prelude::*};
 
 use crate::GameState;
+use crate::minigames::main::cleanup::cleanup_main_game;
 use crate::minigames::main::menu::{exit_game, setup_main_menu, continue_main_game};
+use crate::minigames::main::room::{setup_bookshelf, setup_bed, setup_drawer, setup_floor, setup_walls, setup_heaters, setup_table};
 use crate::minigames::shared::menu::menu_action::MenuAction;
 use crate::minigames::shared::menu::state_management::cleanup_menu;
 use crate::minigames::{MinigameState};
@@ -21,6 +26,22 @@ impl Plugin for MainMinigamePlugin {
 
             .insert_state(GameState::Play)
             .insert_state(MenuAction::None)
+            .add_systems(
+                OnEnter(MinigameState::Main),
+                (
+                    setup_walls,
+                    setup_bookshelf,
+                    setup_bed,
+                    setup_drawer,
+                    setup_heaters,
+                    setup_table,
+                    setup_floor,
+                )
+            )
+            .add_systems(
+                OnExit(MinigameState::Main),
+                cleanup_main_game,
+            )
             .add_systems(
                 Update,
                 choose_minigame
