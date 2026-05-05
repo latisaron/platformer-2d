@@ -15,27 +15,27 @@ pub fn setup_controllable_block(
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
-    commands.spawn((
-        Mesh2d(meshes.add(Rectangle::new(100.0, 100.0))),
-        MeshMaterial2d(materials.add(Color::srgb(1., 1., 1.))),
-    ))
-    .insert(RigidBody::Dynamic)
-    .insert(Collider::cuboid(50.0, 50.0))
-    .insert(Restitution {
-        coefficient: 0.0,
-        combine_rule: CoefficientCombineRule::Min,
-    })
-    .insert(Transform::from_xyz(0.0, 0.0, 0.0))
-    .insert(Velocity::zero())
-    .insert(Damping {
-        linear_damping: 10.0,
-        angular_damping: 10.0,
-    })
-    .insert(LockedAxes::ROTATION_LOCKED)
-    .insert(Sleeping::disabled())
-    .insert(Ccd::enabled())
-    .insert(GravityScale(0.0))
-    .insert(Direction::Right);
+    // commands.spawn((
+    //     Mesh2d(meshes.add(Rectangle::new(100.0, 100.0))),
+    //     MeshMaterial2d(materials.add(Color::srgb(1., 1., 1.))),
+    // ))
+    // .insert(RigidBody::Dynamic)
+    // .insert(Collider::cuboid(50.0, 50.0))
+    // .insert(Restitution {
+    //     coefficient: 0.0,
+    //     combine_rule: CoefficientCombineRule::Min,
+    // })
+    // .insert(Transform::from_xyz(0.0, 0.0, 0.0))
+    // .insert(Velocity::zero())
+    // .insert(Damping {
+    //     linear_damping: 10.0,
+    //     angular_damping: 10.0,
+    // })
+    // .insert(LockedAxes::ROTATION_LOCKED)
+    // .insert(Sleeping::disabled())
+    // .insert(Ccd::enabled())
+    // .insert(GravityScale(0.0))
+    // .insert(Direction::Right);
 }
 
 pub fn keyboard_input(

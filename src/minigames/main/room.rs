@@ -157,6 +157,25 @@ pub fn setup_heaters(
     spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/radiator.png"));
 }
 
+pub fn setup_wall_floor_boundary(
+    mut commands: Commands,
+    window: Single<&Window>,
+) {
+    let rw = window.resolution.width();
+    let rh = window.resolution.height();
+
+    // Sits at the visual boundary between the pink wall and the floor rug (~20% from top)
+    let y = rh / 2.0 - (0.18 * rh);
+
+    commands.spawn((
+        Transform::from_xyz(0.0, y, 0.0),
+        RigidBody::Fixed,
+        Collider::cuboid(rw / 2.0, 2.0),
+        Restitution { coefficient: 0.0, combine_rule: CoefficientCombineRule::Min },
+        MainCleanup,
+    ));
+}
+
 pub fn setup_floor(
     mut commands: Commands,
     asset_server: Res<AssetServer>,

@@ -10,7 +10,7 @@ use bevy::{prelude::*};
 use crate::GameState;
 use crate::minigames::main::cleanup::cleanup_main_game;
 use crate::minigames::main::menu::{exit_game, setup_main_menu, continue_main_game};
-use crate::minigames::main::room::{setup_bookshelf, setup_bed, setup_drawer, setup_floor, setup_walls, setup_heaters, setup_table, setup_gift};
+use crate::minigames::main::room::{setup_bookshelf, setup_bed, setup_drawer, setup_floor, setup_walls, setup_heaters, setup_table, setup_gift, setup_wall_floor_boundary};
 use crate::minigames::main::movable_block::{setup_controllable_block, keyboard_input};
 use crate::minigames::shared::menu::menu_action::MenuAction;
 use crate::minigames::shared::menu::state_management::cleanup_menu;
@@ -48,6 +48,7 @@ impl Plugin for MainMinigamePlugin {
                     setup_heaters,
                     setup_table,
                     setup_floor,
+                    setup_wall_floor_boundary,
                     setup_controllable_block,
                 ).chain()
             )

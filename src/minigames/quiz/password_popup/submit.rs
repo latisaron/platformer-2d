@@ -51,7 +51,7 @@ pub fn handle_submit_click(
     mut menu_state: ResMut<NextState<MenuAction>>,
     mut level: Single<&mut Level>,
     mut score: Single<&mut Score>,
-    mut quiz_level: Single<&QuizLevel>,
+    mut quiz_level: Single<&mut QuizLevel>,
 ) {
     if keys.just_pressed(MouseButton::Left) {
         if let Some(position) = window.cursor_position() {
