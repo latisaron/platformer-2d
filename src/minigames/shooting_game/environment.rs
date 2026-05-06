@@ -1,7 +1,7 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-// const ENVIRONMENT_ASSET: &'static str = "shooting_game/tests/environment.png";
-const ENVIRONMENT_ASSET: &'static str = "shooting_game/environment.png";
+const ENVIRONMENT_ASSET: &'static str = "shooting_game/tests/environment.png";
+// const ENVIRONMENT_ASSET: &'static str = "shooting_game/environment.png";
 
 #[derive(Component)]
 pub struct EnvironmentCleanup;
