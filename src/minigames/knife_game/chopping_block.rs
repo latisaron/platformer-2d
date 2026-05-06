@@ -32,7 +32,7 @@ pub fn create_chopping_block(
 
     commands.spawn((
         Sprite {
-            image: asset_server.load("knife_game/pula.png"),
+            image: asset_server.load("knife_game/ant.png"),
             rect: Some(Rect {
                 min: Vec2::new(
                     image_center - image_width / 2.,

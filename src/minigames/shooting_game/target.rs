@@ -30,11 +30,11 @@ const MAX_TARGET_COUNT: usize = 10;
 
 const SWITCH_DIRECTION_PERCENTAGE: u32 = 99;
 
-const POSSIBLE_FRIENDS: [&str; 3] = ["shooting_game/green_atlas.png", "shooting_game/green_atlas.png", "shooting_game/green_atlas.png"];
-const POSSIBLE_ENEMIES: [&str; 3] = ["shooting_game/red_atlas.png", "shooting_game/red_atlas.png", "shooting_game/red_atlas.png"];
+// const POSSIBLE_FRIENDS: [&str; 3] = ["shooting_game/green_atlas.png", "shooting_game/green_atlas.png", "shooting_game/green_atlas.png"];
+// const POSSIBLE_ENEMIES: [&str; 3] = ["shooting_game/red_atlas.png", "shooting_game/red_atlas.png", "shooting_game/red_atlas.png"];
 
-// const POSSIBLE_FRIENDS: [&str; 3] = ["shooting_game/tests/green1_atlas.png", "shooting_game/tests/green2_atlas.png", "shooting_game/tests/green3_atlas.png"];
-// const POSSIBLE_ENEMIES: [&str; 3] = ["shooting_game/tests/red1_atlas.png", "shooting_game/tests/red2_atlas.png", "shooting_game/tests/red3_atlas.png"];
+const POSSIBLE_FRIENDS: [&str; 3] = ["shooting_game/tests/green1_atlas.png", "shooting_game/tests/green2_atlas.png", "shooting_game/tests/green3_atlas.png"];
+const POSSIBLE_ENEMIES: [&str; 3] = ["shooting_game/tests/red1_atlas.png", "shooting_game/tests/red2_atlas.png", "shooting_game/tests/red3_atlas.png"];
 
 #[derive(Eq, PartialEq, Debug)]
 pub enum TargetDirection {
