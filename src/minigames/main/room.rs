@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
-use crate::minigames::main::cleanup::MainCleanup;
+use crate::minigames::main::{cleanup::MainCleanup, interaction::Interactable};
 
 const WALL_THICKNESS: f32 = 10.0;
 
@@ -27,8 +27,9 @@ fn spawn_solid(
     x: f32, y: f32, w: f32, h: f32,
     z: f32,
     path: String,
+    interactable: usize,
 ) {
-    commands.spawn((
+    let mut a = commands.spawn((
         Sprite {
             image: asset_server.load(&path),
             custom_size: Some(Vec2::new(w, h)),
@@ -40,6 +41,13 @@ fn spawn_solid(
         Restitution { coefficient: 0.0, combine_rule: CoefficientCombineRule::Min },
         MainCleanup,
     ));
+    match interactable {
+        0 => a.insert(Interactable::Knife),
+        1 => a.insert(Interactable::Shoot),
+        2 => a.insert(Interactable::Quiz),
+        _ => { return }
+    };
+    
 }
 
 pub fn setup_walls(
@@ -84,7 +92,7 @@ pub fn setup_bed(
     let rh = window.resolution.height();
     // dropped center_y 31% → 36%
     let (x, y, w, h) = pct_to_world(12.9, 36.0, 24.9, 62.0, rw, rh);
-    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/couch_gun.png"));
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/couch_fin.png"), 1);
 }
 
 pub fn setup_drawer(
@@ -96,7 +104,7 @@ pub fn setup_drawer(
     let rh = window.resolution.height();
     // flush with right wall: center_x = 100 - width/2 = 100 - 16.55 = 83.45%
     let (x, y, w, h) = pct_to_world(83.45, 11.0, 33.1, 22.0, rw, rh);
-    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/drawer_angled.png"));
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/drawer_fin.png"), 1337);
 }
 
 pub fn setup_bookshelf(
@@ -109,7 +117,7 @@ pub fn setup_bookshelf(
     // far right wall, tall and thin
     // center_x ~93.2%, center_y ~59.2%, width ~13.6%, height ~73.1%
     let (x, y, w, h) = pct_to_world(93.2, 60., 30., 73.9, rw, rh);
-    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/book_shelf_2.png"));
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/bookshelf_fin.png"), 2);
 }
 
 pub fn setup_table(
@@ -121,7 +129,7 @@ pub fn setup_table(
     let rh = window.resolution.height();
     // bottom edge flush with bottom wall: center_y = 100 - height/2 = 100 - 11.9 = 88.1%
     let (x, y, w, h) = pct_to_world(64., 88.1, 43.9, 23.8, rw, rh);
-    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/table.png"));
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/table_fin.png"), 0);
 }
 
 pub fn setup_gift(
@@ -134,7 +142,7 @@ pub fn setup_gift(
     // small square on top-left of drawer
     // center_x ~57%, center_y ~8%, width ~8%, height ~11%
     let (x, y, w, h) = pct_to_world(75.0, 20.0, 8.0, 11.0, rw, rh);
-    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/gift.png"));
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/gift.png"), 3);
 }
 
 
@@ -149,12 +157,12 @@ pub fn setup_heaters(
     // iron heater: left edge flush with left wall (center_x = width/2 = 10.1%)
     // sits slightly above wall heater so they don't overlap
     let (x, y, w, h) = pct_to_world(10.1, 89.5, 20.2, 7.0, rw, rh);
-    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/wall_heater.png"));
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/wall_heater.png"), 1337);
 
     // wall heater: flush with bottom wall (center_y = 100 - 3.75 = 96.25%)
     // shifted right enough to not overlap iron heater (right edge of iron = 20.2%, left edge of wall = 20.7%)
     let (x, y, w, h) = pct_to_world(31.0, 96.25, 20.6, 7.5, rw, rh);
-    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/radiator.png"));
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/radiator.png"), 1337);
 }
 
 pub fn setup_wall_floor_boundary(
@@ -186,7 +194,7 @@ pub fn setup_floor(
 
     commands.spawn((
         Sprite {
-            image: asset_server.load("main/backgroundd.png"),
+            image: asset_server.load("main/background_fin.png"),
             custom_size: Some(Vec2::new(rw, rh)),
             image_mode: SpriteImageMode::Auto,
             ..default()

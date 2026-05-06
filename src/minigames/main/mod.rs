@@ -4,14 +4,16 @@ pub mod room;
 pub mod movable_block;
 pub mod cleanup;
 pub mod current_level_state;
+pub mod interaction;
 
 use bevy::{prelude::*};
 
 use crate::GameState;
 use crate::minigames::main::cleanup::cleanup_main_game;
+use crate::minigames::main::interaction::check_interaction;
 use crate::minigames::main::menu::{exit_game, setup_main_menu, continue_main_game};
 use crate::minigames::main::room::{setup_bookshelf, setup_bed, setup_drawer, setup_floor, setup_walls, setup_heaters, setup_table, setup_gift, setup_wall_floor_boundary};
-use crate::minigames::main::movable_block::{setup_controllable_block, keyboard_input};
+use crate::minigames::main::movable_block::{setup_player, keyboard_input, update_animation};
 use crate::minigames::shared::menu::menu_action::MenuAction;
 use crate::minigames::shared::menu::state_management::cleanup_menu;
 use crate::minigames::{MinigameState};
@@ -49,7 +51,7 @@ impl Plugin for MainMinigamePlugin {
                     setup_table,
                     setup_floor,
                     setup_wall_floor_boundary,
-                    setup_controllable_block,
+                    setup_player,
                 ).chain()
             )
             .add_systems(
@@ -59,9 +61,13 @@ impl Plugin for MainMinigamePlugin {
             .add_systems(
                 Update,
                 (
-                    choose_minigame.run_if(in_state(MinigameState::Main))
-                        .run_if(in_state(GameState::Play)),
+                    // choose_minigame.run_if(in_state(MinigameState::Main))
+                    //     .run_if(in_state(GameState::Play)),
                     keyboard_input.run_if(in_state(MinigameState::Main))
+                        .run_if(in_state(GameState::Play)),
+                    update_animation.run_if(in_state(MinigameState::Main))
+                        .run_if(in_state(GameState::Play)),
+                    check_interaction.run_if(in_state(MinigameState::Main))
                         .run_if(in_state(GameState::Play)),
 
                 )
