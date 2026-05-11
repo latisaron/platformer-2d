@@ -45,6 +45,7 @@ fn spawn_solid(
         0 => a.insert(Interactable::Knife),
         1 => a.insert(Interactable::Shoot),
         2 => a.insert(Interactable::Quiz),
+        3 => a.insert(Interactable::Gift),
         _ => { return }
     };
     
