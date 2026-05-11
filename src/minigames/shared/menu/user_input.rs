@@ -21,9 +21,9 @@ pub fn listen_keystroke_menu(
     mut menu_action: ResMut<NextState<MenuAction>>,
     mut query: Single<&mut Menu>,
     mut menu_items: Query<(&MenuItem, &mut BackgroundColor), With<MenuItem>>,
-    knife_game_state: Single<&ChoppingGameState>,
+    knife_game_state: Res<State<ChoppingGameState>>,
 ) {
-    if *key_game_state != ChoppingGameState::Cutting {
+    if *knife_game_state != ChoppingGameState::Cutting {
         if keys.just_pressed(KeyCode::ArrowUp) {
             if query.position == 0 {
                 query.position = query.number_items - 1;
