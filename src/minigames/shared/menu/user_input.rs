@@ -1,11 +1,9 @@
 use bevy::{prelude::*};
 use crate::minigames::{
-    shared::menu::{
-        menu_item_type::MenuItemType,
-        state_management::{
+    knife_game::knife::ChoppingGameState, shared::menu::{
+        menu_action::MenuAction, menu_item_type::MenuItemType, state_management::{
             GameState, Menu, MenuItem
-        },
-        menu_action::{MenuAction},
+        }
     }
 };
 
@@ -23,49 +21,52 @@ pub fn listen_keystroke_menu(
     mut menu_action: ResMut<NextState<MenuAction>>,
     mut query: Single<&mut Menu>,
     mut menu_items: Query<(&MenuItem, &mut BackgroundColor), With<MenuItem>>,
+    knife_game_state: Single<&ChoppingGameState>,
 ) {
-     if keys.just_pressed(KeyCode::ArrowUp) {
-        if query.position == 0 {
-            query.position = query.number_items - 1;
-        } else {
-            query.position -= 1;
-        }
-
-        // hsould move
-        for (item, mut color) in menu_items.iter_mut() {
-            if item.position == query.position {
-                *color = BackgroundColor(Color::srgb(0.3, 0.3, 0.8)); // highlighted
+    if *key_game_state != ChoppingGameState::Cutting {
+        if keys.just_pressed(KeyCode::ArrowUp) {
+            if query.position == 0 {
+                query.position = query.number_items - 1;
             } else {
-                *color = BackgroundColor(Color::NONE);
+                query.position -= 1;
             }
-        }
-    } else if keys.just_pressed(KeyCode::ArrowDown) {
-        if query.position == query.number_items - 1 {
-            query.position = 0;
-        } else {
-            query.position += 1;
-        }
 
-        // should move
-        for (item, mut color) in menu_items.iter_mut() {
-            if item.position == query.position {
-                *color = BackgroundColor(Color::srgb(0.3, 0.3, 0.8)); // highlighted
-            } else {
-                *color = BackgroundColor(Color::NONE);
+            // hsould move
+            for (item, mut color) in menu_items.iter_mut() {
+                if item.position == query.position {
+                    *color = BackgroundColor(Color::srgb(0.3, 0.3, 0.8)); // highlighted
+                } else {
+                    *color = BackgroundColor(Color::NONE);
+                }
             }
-        }
-    } else if keys.just_pressed(KeyCode::Enter) {
-        if let Some(result) =  menu_items.into_iter().find(|(item, _)| item.position == query.position) {
-            match result.0.menu_item_type {
-                MenuItemType::Continue(_) => {
-                    menu_action.set(MenuAction::PreContinue);
-                },
-                MenuItemType::Restart(_) => {
-                    menu_action.set(MenuAction::PreRestart);
-                },
-                MenuItemType::Exit(_) => {
-                    menu_action.set(MenuAction::PreExit);
-                },
+        } else if keys.just_pressed(KeyCode::ArrowDown) {
+            if query.position == query.number_items - 1 {
+                query.position = 0;
+            } else {
+                query.position += 1;
+            }
+
+            // should move
+            for (item, mut color) in menu_items.iter_mut() {
+                if item.position == query.position {
+                    *color = BackgroundColor(Color::srgb(0.3, 0.3, 0.8)); // highlighted
+                } else {
+                    *color = BackgroundColor(Color::NONE);
+                }
+            }
+        } else if keys.just_pressed(KeyCode::Enter) {
+            if let Some(result) =  menu_items.into_iter().find(|(item, _)| item.position == query.position) {
+                match result.0.menu_item_type {
+                    MenuItemType::Continue(_) => {
+                        menu_action.set(MenuAction::PreContinue);
+                    },
+                    MenuItemType::Restart(_) => {
+                        menu_action.set(MenuAction::PreRestart);
+                    },
+                    MenuItemType::Exit(_) => {
+                        menu_action.set(MenuAction::PreExit);
+                    },
+                }
             }
         }
     }

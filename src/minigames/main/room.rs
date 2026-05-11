@@ -157,12 +157,12 @@ pub fn setup_heaters(
     // iron heater: left edge flush with left wall (center_x = width/2 = 10.1%)
     // sits slightly above wall heater so they don't overlap
     let (x, y, w, h) = pct_to_world(10.1, 89.5, 20.2, 7.0, rw, rh);
-    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/wall_heater.png"), 1337);
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/radiator.png"), 1337);
 
     // wall heater: flush with bottom wall (center_y = 100 - 3.75 = 96.25%)
     // shifted right enough to not overlap iron heater (right edge of iron = 20.2%, left edge of wall = 20.7%)
     let (x, y, w, h) = pct_to_world(31.0, 96.25, 20.6, 7.5, rw, rh);
-    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/radiator.png"), 1337);
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/wall_heater.png"), 1337);
 }
 
 pub fn setup_wall_floor_boundary(
