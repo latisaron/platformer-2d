@@ -143,7 +143,7 @@ pub fn setup_gift(
     // small square on top-left of drawer
     // center_x ~57%, center_y ~8%, width ~8%, height ~11%
     let (x, y, w, h) = pct_to_world(75.0, 20.0, 8.0, 11.0, rw, rh);
-    spawn_solid(&mut commands, &asset_server, x, y, w, h, 1., String::from("main/gift.png"), 3);
+    spawn_solid(&mut commands, &asset_server, x, y, w, h, 2., String::from("main/gift.png"), 3);
 }
 
 

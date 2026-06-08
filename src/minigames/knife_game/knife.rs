@@ -241,6 +241,7 @@ pub fn cut_animation(
                         new_center,
                         window.resolution.height() * CHOPPING_BLOCK_HEIGHT_PERCENTAGE,
                         window.resolution.width() * CHOPPING_BLOCK_WIDTH_PERCENTAGE,
+                        level.current_value,
                     );
                     if score.0 == level.target_score - 1 {
                         menu_action_state.set(MenuAction::PreWin);

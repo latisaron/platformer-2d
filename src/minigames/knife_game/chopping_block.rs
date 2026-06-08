@@ -1,13 +1,8 @@
 use bevy::{prelude::*};
 
-use crate::minigames::knife_game::{
-    CHOPPING_BLOCK_WIDTH_PERCENTAGE,
-    CHOPPING_BLOCK_HEIGHT_PERCENTAGE,
-    IMAGE_HEIGHT,
-    IMAGE_WIDTH,
-    CUTTABLE_Z_INDEX,
-    BACKGROUND_Z_INDEX,
-};
+use crate::minigames::{knife_game::{
+    BACKGROUND_Z_INDEX, CHOPPING_BLOCK_HEIGHT_PERCENTAGE, CHOPPING_BLOCK_WIDTH_PERCENTAGE, CUTTABLE_Z_INDEX, IMAGE_HEIGHT, IMAGE_WIDTH
+}, shared::level::Level};
 
 #[derive(Component)]
 pub struct ChoppingBlock{
@@ -25,14 +20,21 @@ pub fn create_chopping_block(
     chopping_block_center: f32,
     chopping_block_height: f32,
     reference_width: f32,
+    level: usize,
 ) {
     let image_center = ((chopping_block_center + reference_width  / 2.) / reference_width) * IMAGE_WIDTH; 
     let image_height = IMAGE_HEIGHT;
     let image_width = (chopping_block_width / reference_width) * IMAGE_WIDTH;
+    
+    let image_path = match level {
+        1 => "knife_game/ant.png",
+        2 => "knife_game/dark_ant.png",
+        _ => "knife_game/final_boss_ant.png",
+    };
 
     commands.spawn((
         Sprite {
-            image: asset_server.load("knife_game/ant.png"),
+            image: asset_server.load(image_path),
             rect: Some(Rect {
                 min: Vec2::new(
                     image_center - image_width / 2.,
@@ -59,6 +61,7 @@ pub fn setup_chopping_block(
     mut meshes: ResMut<Assets<Mesh>>,
     mut asset_server: ResMut<AssetServer>,
     window: Single<& Window>,
+    level: Single<& Level>,
 ) {
     let window_width = window.resolution.width();
     let window_height = window.resolution.height();
@@ -74,6 +77,7 @@ pub fn setup_chopping_block(
         chopping_block_center,
         chopping_block_height,
         chopping_block_width,
+        level.current_value,
     );
 
     let background_width = chopping_block_width * 1.2;
@@ -105,6 +109,7 @@ pub fn reset_chopping_block(
     meshes: &mut ResMut<Assets<Mesh>>,
     window: &Single<& Window>,
     cleanup_entities: Query<(Entity, &CleanupChoppingBlock)>,
+    level: Single<& Level>,
 ) {
     for entities in cleanup_entities {
         commands.entity(entities.0).despawn();
@@ -124,6 +129,7 @@ pub fn reset_chopping_block(
         chopping_block_center,
         chopping_block_height,
         chopping_block_width,
+        level.current_value,
     );
 
     let background_width = chopping_block_width * 1.2;

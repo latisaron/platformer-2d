@@ -1,4 +1,4 @@
-use bevy::{prelude::*};
+use bevy::{prelude::*, window::{CursorIcon, CursorOptions, PrimaryWindow}};
 
 use crate::minigames::{
     MinigameState,
@@ -56,6 +56,15 @@ pub enum QuizGameState {
     Browsing,
 }
 
+pub fn restore_default_cursor(
+    mut commands: Commands,
+    window: Single<Entity, With<PrimaryWindow>>,
+    mut cursor_options: Single<&mut CursorOptions>,
+) {
+    cursor_options.visible = true;
+    commands.entity(*window).insert(CursorIcon::default());
+}
+
 pub struct QuizMinigamePlugin;
 
 impl Plugin for QuizMinigamePlugin {
@@ -72,6 +81,7 @@ impl Plugin for QuizMinigamePlugin {
                     setup_player_model,
                     setup_inventory_ui,
                     create_background,
+                    restore_default_cursor,
                 ).chain()
             )
             .add_systems(

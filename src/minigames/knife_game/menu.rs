@@ -98,6 +98,7 @@ pub fn restart_knife_game(
     mut commands: Commands,
     mut asset_server: ResMut<AssetServer>,
     window: Single<& Window>,
+    level: Single<& Level>,
     // chopping block
     cleanup_chopping_block_entities: Query<(Entity, &CleanupChoppingBlock)>,
     // score
@@ -106,7 +107,7 @@ pub fn restart_knife_game(
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     cleanup_knife_entities: Query<(Entity, &CleanupKnife)>,
 ) {
-    reset_chopping_block(&mut commands, &mut asset_server, &mut materials, &mut meshes, &window, cleanup_chopping_block_entities);
+    reset_chopping_block(&mut commands, &mut asset_server, &mut materials, &mut meshes, &window, cleanup_chopping_block_entities, level);
     reset_knife(&mut commands, &mut materials, &mut meshes, &mut texture_atlas_layouts, &mut asset_server, &window, cleanup_knife_entities);
     reset_score(score);
     chopping_game_state.set(ChoppingGameState::Playing);

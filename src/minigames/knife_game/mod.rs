@@ -106,8 +106,10 @@ impl Plugin for KnifeMinigamePlugin {
                 // actual minigame stuff
     Update,
         (
-                    register_keystroke.run_if(in_state(ChoppingGameState::Playing)),
-                    cut_animation.run_if(in_state(ChoppingGameState::Cutting)),
+                    register_keystroke.run_if(in_state(ChoppingGameState::Playing))
+                        .run_if(in_state(MenuAction::None)),
+                    cut_animation.run_if(in_state(ChoppingGameState::Cutting))
+                        .run_if(in_state(MenuAction::None)),
                     move_objects.run_if(in_state(ChoppingGameState::Playing))
                 ).run_if(in_state(MinigameState::Knife))
             );

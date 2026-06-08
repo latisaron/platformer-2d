@@ -4,9 +4,9 @@ use crate::minigames::{main::current_level_state::KnifeLevel, shared::level::{Cl
 pub fn knife_hash(level: usize) -> usize {
     match level {
         1 => 3,
-        2 => 5,
-        3 => 7,
-        _ => 1337,
+        2 => 4,
+        3 => 5,
+        _ => 8,
     }
 }
 

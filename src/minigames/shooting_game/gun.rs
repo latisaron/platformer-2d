@@ -68,6 +68,13 @@ pub fn setup_cursor_icon(
     ));
 }
 
+pub fn restore_default_cursor(
+    mut commands: Commands,
+    window: Single<Entity, With<PrimaryWindow>>,
+) {
+    commands.entity(*window).remove::<CursorIcon>();
+}
+
 pub fn hide_cursor(mut cursor_options: Single<&mut CursorOptions>) {
     cursor_options.visible = false;
 }

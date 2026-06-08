@@ -5,7 +5,7 @@ use crate::minigames::{
         bullets_display::{
             cleanup_bullets_text, display_bullets, setup_bullets
         }, gun::{
-            GunAnimationState, animate_gun_in, animate_gun_out, cleanup_gun, gun_follows_mouse, hide_cursor, setup_cursor_icon, setup_gun, show_cursor
+            GunAnimationState, animate_gun_in, animate_gun_out, cleanup_gun, gun_follows_mouse, hide_cursor, setup_cursor_icon, restore_default_cursor, setup_gun, show_cursor
         }, level::setup_minigame_level, menu::{continue_shoot_game, exit_shoot_game, restart_shoot_game, setup_lose_menu, setup_shoot_menu, setup_win_menu}, score::setup_minigame_score, target::{
             advance_expire_and_despawn, animate_target, cleanup_targets, listen_for_shots_in_target, maintain_intended_target_count, move_targets, remove_soft_deleted_targets
         }, timer::{cleanup_timer, setup_timer, update_timer},
@@ -58,6 +58,7 @@ impl Plugin for ShootingMinigamePlugin {
                 // delete things from the minigame after exiting
                 OnExit(MinigameState::Shoot),
                 (
+                    restore_default_cursor,
                     cleanup_bullets_text,
                     cleanup_environment,
                     cleanup_gun,

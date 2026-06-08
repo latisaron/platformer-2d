@@ -38,11 +38,16 @@ pub fn check_interaction(
             MainGameState::NaughtyScreen
         };
 
-
     for (obj_transform, interactable) in &interactable_query {
         let obj_pos = obj_transform.translation.truncate();
         let dist = player_pos.distance(obj_pos);
-        if dist <= INTERACT_RADIUS {
+
+        let radius = match interactable {
+            Interactable::Gift => 250.0,
+                _ => INTERACT_RADIUS,
+            };
+        
+        if dist <= radius {
                         match interactable {
                 Interactable::Knife => next_state.set(MinigameState::Knife),
                 Interactable::Shoot => next_state.set(MinigameState::Shoot),
