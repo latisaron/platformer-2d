@@ -62,7 +62,7 @@ pub fn setup_gift_screen(
 
     commands.spawn((
         Sprite {
-            image: asset_server.load("main/gift.png"),
+            image: asset_server.load("main/fin.png"),
             custom_size: Some(Vec2::new(window_width * 0.8, window_height * 0.8)),
             image_mode: SpriteImageMode::Auto,
             ..default()
